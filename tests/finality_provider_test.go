@@ -9,13 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/babylonchain/staking-api-service/internal/api/handlers"
-	"github.com/babylonchain/staking-api-service/internal/config"
-	"github.com/babylonchain/staking-api-service/internal/db"
-	"github.com/babylonchain/staking-api-service/internal/db/model"
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/types"
-	testmock "github.com/babylonchain/staking-api-service/tests/mocks"
+	"github.com/scalarorg/xchains-api/internal/api/handlers"
+	"github.com/scalarorg/xchains-api/internal/config"
+	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/db/model"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/types"
+	testmock "github.com/scalarorg/xchains-api/tests/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -194,7 +194,7 @@ func FuzzTestGetFinalityProviderWithPaginationResponse(f *testing.F) {
 		if err != nil {
 			t.Fatalf("Failed to load test config: %v", err)
 		}
-		cfg.Db.MaxPaginationLimit = 2
+		cfg.MongoDb.MaxPaginationLimit = 2
 
 		testServer := setupTestServer(t, &TestServerDependency{ConfigOverrides: cfg})
 		defer testServer.Close()

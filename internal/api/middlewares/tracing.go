@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/observability/tracing"
+	"github.com/scalarorg/xchains-api/internal/observability/tracing"
 )
 
 func TracingMiddleware(next http.Handler) http.Handler {

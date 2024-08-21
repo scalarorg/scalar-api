@@ -39,7 +39,7 @@ build
 # Generated files
 .idea/**/contentModel.xml
 .idea/**/.gitignore
-.idea/**/babylon.iml
+.idea/**/scalarorg.iml
 .idea/**/modules.xml
 .idea/**/vcs.xml
 
@@ -201,15 +201,12 @@ wasmbinding/testdata/target
 # The following content is adapted from https://github.com/osmosis-labs/osmosis/blob/main/.gitignore
 
 /main
-/babylond
 /.idea/
 /artifacts/
 /.vscode/
 /.VSCodeCounter/
 /scripts/local/
-/x/incentives/keeper/babylon_testing/
 tools-stamp
-/tests/localbabylon/.babylond/*
 docs/diagrams/plantuml.jar
 .testnets/
 .testnet/
@@ -221,3 +218,4 @@ output/
 tests/__debug*
 
 rabbitmq_data
+postgres_data

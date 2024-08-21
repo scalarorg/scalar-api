@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/db/model"
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/db/model"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 func (s *Services) CreateDApp(ctx context.Context, chainName, btcAddressHex, publicKeyHex string) *types.Error {

@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/types"
-	"github.com/babylonchain/staking-queue-client/client"
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/staking-queue-client/client"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 type QueueHandler struct {

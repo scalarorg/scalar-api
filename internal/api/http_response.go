@@ -6,9 +6,9 @@ import (
 
 	logger "github.com/rs/zerolog"
 
-	"github.com/babylonchain/staking-api-service/internal/api/handlers"
-	"github.com/babylonchain/staking-api-service/internal/observability/metrics"
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/api/handlers"
+	"github.com/scalarorg/xchains-api/internal/observability/metrics"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 type ErrorResponse struct {

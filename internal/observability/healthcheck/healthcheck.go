@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/babylonchain/staking-api-service/internal/observability/metrics"
-	"github.com/babylonchain/staking-api-service/internal/queue"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/xchains-api/internal/observability/metrics"
+	"github.com/scalarorg/xchains-api/internal/queue"
 )
 
 var logger zerolog.Logger = log.Logger
@@ -22,7 +22,7 @@ func StartHealthCheckCron(ctx context.Context, queues *queue.Queues, cronTime in
 	logger.Info().Msg("Initiated Health Check Cron")
 
 	if cronTime == 0 {
-    cronTime = 60
+		cronTime = 60
 	}
 
 	cronSpec := fmt.Sprintf("@every %ds", cronTime)

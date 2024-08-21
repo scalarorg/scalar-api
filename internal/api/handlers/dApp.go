@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 type CreateDAppRequestPayload struct {

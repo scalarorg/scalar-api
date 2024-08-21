@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/babylonchain/staking-api-service/internal/observability/tracing"
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/xchains-api/internal/observability/tracing"
 )
 
 func LoggingMiddleware(next http.Handler) http.Handler {

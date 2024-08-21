@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/config"
+	"github.com/scalarorg/xchains-api/internal/config"
 )
 
 var methodsToCheck = map[string]struct{}{

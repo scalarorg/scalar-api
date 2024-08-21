@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/config"
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/types"
-	"github.com/babylonchain/staking-api-service/internal/utils"
 	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/scalarorg/xchains-api/internal/config"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/types"
+	"github.com/scalarorg/xchains-api/internal/utils"
 )
 
 type Handler struct {

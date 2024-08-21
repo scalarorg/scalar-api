@@ -9,8 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/babylonchain/staking-api-service/internal/db/model"
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/db/model"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 func (db *Database) SaveActiveStakingDelegation(

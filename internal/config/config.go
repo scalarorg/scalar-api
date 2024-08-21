@@ -5,15 +5,16 @@ import (
 	"os"
 	"strings"
 
-	queue "github.com/babylonchain/staking-queue-client/config"
+	queue "github.com/scalarorg/staking-queue-client/config"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Server  ServerConfig      `mapstructure:"server"`
-	Db      DbConfig          `mapstructure:"db"`
-	Queue   queue.QueueConfig `mapstructure:"queue"`
-	Metrics MetricsConfig     `mapstructure:"metrics"`
+	Server     ServerConfig      `mapstructure:"server"`
+	MongoDb    MongoDbConfig     `mapstructure:"mongodb"`
+	PostgresDb PostgresDBConfig  `mapstructure:"postgresdb"`
+	Queue      queue.QueueConfig `mapstructure:"queue"`
+	Metrics    MetricsConfig     `mapstructure:"metrics"`
 }
 
 func (cfg *Config) Validate() error {
@@ -21,7 +22,11 @@ func (cfg *Config) Validate() error {
 		return err
 	}
 
-	if err := cfg.Db.Validate(); err != nil {
+	if err := cfg.MongoDb.Validate(); err != nil {
+		return err
+	}
+
+	if err := cfg.PostgresDb.Validate(); err != nil {
 		return err
 	}
 

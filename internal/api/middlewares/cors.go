@@ -3,14 +3,14 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/config"
 	"github.com/rs/cors"
+	"github.com/scalarorg/xchains-api/internal/config"
 )
 
 const (
 	maxAge                    = 300
 	stakerDelegationCheckPath = "/v1/staker/delegation/check"
-	dAppPath				  = "/v1/dApp"
+	dAppPath                  = "/v1/dApp"
 	galxeOrigin               = "https://app.galxe.com"
 )
 

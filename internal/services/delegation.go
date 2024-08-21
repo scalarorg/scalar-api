@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/db"
-	"github.com/babylonchain/staking-api-service/internal/db/model"
-	"github.com/babylonchain/staking-api-service/internal/types"
-	"github.com/babylonchain/staking-api-service/internal/utils"
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/db/model"
+	"github.com/scalarorg/xchains-api/internal/types"
+	"github.com/scalarorg/xchains-api/internal/utils"
 )
 
 type TransactionPublic struct {

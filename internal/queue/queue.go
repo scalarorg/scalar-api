@@ -7,14 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/babylonchain/staking-api-service/internal/observability/metrics"
-	"github.com/babylonchain/staking-api-service/internal/observability/tracing"
-	"github.com/babylonchain/staking-api-service/internal/queue/handlers"
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/types"
-	"github.com/babylonchain/staking-queue-client/client"
-	queueConfig "github.com/babylonchain/staking-queue-client/config"
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/staking-queue-client/client"
+	queueConfig "github.com/scalarorg/staking-queue-client/config"
+	"github.com/scalarorg/xchains-api/internal/observability/metrics"
+	"github.com/scalarorg/xchains-api/internal/observability/tracing"
+	"github.com/scalarorg/xchains-api/internal/queue/handlers"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 type Queues struct {
@@ -263,7 +263,7 @@ func recordErrorLog(err *types.Error) {
 func (q *Queues) IsConnectionHealthy() error {
 	var errorMessages []string
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	checkQueue := func(name string, client client.QueueClient) {

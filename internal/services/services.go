@@ -6,9 +6,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/babylonchain/staking-api-service/internal/config"
-	"github.com/babylonchain/staking-api-service/internal/db"
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/config"
+	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 // Service layer contains the business logic and is used to interact with
@@ -26,7 +26,7 @@ func New(
 	globalParams *types.GlobalParams,
 	finalityProviders []types.FinalityProviderDetails,
 ) (*Services, error) {
-	dbClient, err := db.New(ctx, cfg.Db)
+	dbClient, err := db.New(ctx, cfg.MongoDb)
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating db client")
 		return nil, err

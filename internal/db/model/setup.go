@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/babylonchain/staking-api-service/internal/config"
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/xchains-api/internal/config"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -50,7 +50,9 @@ var collections = map[string][]index{
 }
 
 func Setup(ctx context.Context, cfg *config.Config) error {
-	clientOps := options.Client().ApplyURI(cfg.Db.Address)
+	fmt.Printf("MongoDB Address %s", cfg.MongoDb.Address)
+	fmt.Printf("PostgresDB Address %s:%d", cfg.PostgresDb.Host, cfg.PostgresDb.Port)
+	clientOps := options.Client().ApplyURI(cfg.MongoDb.Address)
 	client, err := mongo.Connect(ctx, clientOps)
 	if err != nil {
 		return err
@@ -61,7 +63,7 @@ func Setup(ctx context.Context, cfg *config.Config) error {
 	defer cancel()
 
 	// Access a database and create collections.
-	database := client.Database(cfg.Db.DbName)
+	database := client.Database(cfg.MongoDb.DbName)
 
 	// Create collections.
 	for collection := range collections {

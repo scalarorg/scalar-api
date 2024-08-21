@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/babylonchain/staking-api-service/internal/config"
+	"github.com/scalarorg/xchains-api/internal/config"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -12,7 +12,7 @@ import (
 type Database struct {
 	DbName string
 	Client *mongo.Client
-	cfg    config.DbConfig
+	cfg    config.MongoDbConfig
 }
 
 type DbResultMap[T any] struct {
@@ -20,7 +20,7 @@ type DbResultMap[T any] struct {
 	PaginationToken string `json:"paginationToken"`
 }
 
-func New(ctx context.Context, cfg config.DbConfig) (*Database, error) {
+func New(ctx context.Context, cfg config.MongoDbConfig) (*Database, error) {
 	clientOps := options.Client().ApplyURI(cfg.Address)
 	client, err := mongo.Connect(ctx, clientOps)
 	if err != nil {

@@ -29,7 +29,7 @@ jobs:
           key: go-mod-v6-{{ checksum "go.sum" }}
           paths:
             - "/home/circleci/.go_workspace/pkg/mod"
-      # TODO: https://github.com/babylonchain/staking-api-service/issues/29
+      # TODO: https://github.com/scalarorg/xchains-api/issues/29
       # - run:
       #     name: Lint
       #     command: |
@@ -50,18 +50,18 @@ jobs:
       - aws-ecr/build-image:
           push-image: false
           dockerfile: Dockerfile
-          path: ./contrib/images/staking-api-service/
+          path: ./contrib/images/xchains-api/
           build-path: ./
           tag: "$CIRCLE_SHA1,$CIRCLE_TAG"
-          repo: "staking-api-service"
+          repo: "xchains-api"
       - run:
           name: Save Docker image to export it to workspace
           command: |
-            docker save $(docker image ls --format '{{.Repository}}:{{.Tag}}') > /tmp/staking-api-service.tar
+            docker save $(docker image ls --format '{{.Repository}}:{{.Tag}}') > /tmp/xchains-api.tar
       - persist_to_workspace:
           root: /tmp
           paths:
-            - staking-api-service.tar
+            - xchains-api.tar
 
   push_docker:
     machine:
@@ -74,7 +74,7 @@ jobs:
       - run:
           name: Load Docker image from workspace
           command: |
-            docker load -i /tmp/staking-api-service.tar
+            docker load -i /tmp/xchains-api.tar
       - aws-ecr/ecr-login:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
@@ -82,7 +82,7 @@ jobs:
       - aws-ecr/push-image:
           registry-id: AWS_ECR_REGISTRY_ID
           region: "$AWS_REGION"
-          repo: "staking-api-service"
+          repo: "xchains-api"
           tag: "$CIRCLE_SHA1,$CIRCLE_TAG"
 
 workflows:

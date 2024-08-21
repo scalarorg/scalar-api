@@ -30,9 +30,9 @@ $(BUILDDIR)/:
 .PHONY: build install tests
 
 build-docker:
-	$(MAKE) BBN_PRIV_DEPLOY_KEY=${BBN_PRIV_DEPLOY_KEY} -C contrib/images staking-api-service
+	$(MAKE) BBN_PRIV_DEPLOY_KEY=${BBN_PRIV_DEPLOY_KEY} -C contrib/images xchains-api
 
-start-staking-api-service: build-docker stop-service
+start-xchains-api: build-docker stop-service
 	docker-compose up -d
 
 stop-service:
@@ -41,7 +41,7 @@ stop-service:
 run-local:
 	./bin/local-startup.sh;
 	sleep 5;
-	go run cmd/staking-api-service/main.go \
+	go run cmd/xchains-api/main.go \
 		--config config/config-local.yml \
 		--params config/global-params.json \
 		--finality-providers config/finality-providers.json
@@ -50,7 +50,7 @@ run-local:
 run-unprocessed-events-replay-local:
 	./bin/local-startup.sh;
 	sleep 5;
-	go run cmd/staking-api-service/main.go \
+	go run cmd/xchains-api/main.go \
 		--config config/config-local.yml \
 		--params config/global-params.json \
 		--finality-providers config/finality-providers.json \
@@ -65,4 +65,4 @@ tests:
 
 
 build-swagger:
-	swag init --parseDependency --parseInternal -d cmd/staking-api-service,internal/api,internal/types
+	swag init --parseDependency --parseInternal -d cmd/xchains-api,internal/api,internal/types

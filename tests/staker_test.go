@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/babylonchain/staking-api-service/internal/api"
-	"github.com/babylonchain/staking-api-service/internal/api/handlers"
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/utils"
-	"github.com/babylonchain/staking-queue-client/client"
+	"github.com/scalarorg/staking-queue-client/client"
+	"github.com/scalarorg/xchains-api/internal/api"
+	"github.com/scalarorg/xchains-api/internal/api/handlers"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 

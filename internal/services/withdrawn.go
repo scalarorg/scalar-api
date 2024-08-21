@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/db"
-	"github.com/babylonchain/staking-api-service/internal/types"
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 func (s *Services) TransitionToWithdrawnState(
