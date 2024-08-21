@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/babylonchain/staking-queue-client/client"
+	"github.com/scalarorg/staking-queue-client/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/babylonchain/staking-api-service/internal/api/handlers"
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/api/handlers"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 const (

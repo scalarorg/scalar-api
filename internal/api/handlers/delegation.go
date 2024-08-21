@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 // GetDelegationByTxHash @Summary Get a delegation

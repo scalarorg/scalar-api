@@ -14,7 +14,7 @@ sleep 5
 
 # Create the necessary indexes
 mongosh --eval "
-db = db.getSiblingDB('staking-api-service');
+db = db.getSiblingDB('xchains-api');
 db.unbonding_queue.createIndex({'unbonding_tx_hash_hex': 1}, {unique: true});
 db.timelock_queue.createIndex({'expire_height': 1}, {unique: false});
 db.gmps.createIndex({'id': 1}, {unique: true});

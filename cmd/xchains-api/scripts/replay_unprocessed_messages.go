@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/babylonchain/staking-api-service/internal/config"
-	"github.com/babylonchain/staking-api-service/internal/db"
-	"github.com/babylonchain/staking-api-service/internal/queue"
-	queueClient "github.com/babylonchain/staking-queue-client/client"
 	"github.com/rs/zerolog/log"
+	queueClient "github.com/scalarorg/staking-queue-client/client"
+	"github.com/scalarorg/xchains-api/internal/config"
+	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/queue"
 )
 
 type GenericEvent struct {

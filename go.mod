@@ -7,13 +7,13 @@ toolchain go1.22.4
 require (
 	github.com/babylonchain/babylon v0.9.0-rc.1
 	github.com/babylonchain/networks/parameters v0.2.1
-	github.com/babylonchain/staking-queue-client v0.3.1
 	github.com/btcsuite/btcd v0.24.0
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2
 	github.com/btcsuite/btcd/btcutil v1.1.5
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/scalarorg/staking-queue-client v0.4.1
 	github.com/spf13/viper v1.18.2
 	github.com/swaggo/swag v1.16.3
 	github.com/unrolled/secure v1.14.0
@@ -171,7 +171,6 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
-	github.com/scalarorg/staking-queue-client v0.4.1 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/supranational/blst v0.3.11 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
@@ -245,9 +244,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/babylonchain/staking-api-service => ./
-
-replace github.com/babylonchain/staking-queue-client => github.com/scalarorg/staking-queue-client v0.4.1
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1

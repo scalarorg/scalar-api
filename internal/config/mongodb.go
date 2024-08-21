@@ -10,7 +10,7 @@ const (
 	maxLogicalShardCount = 100
 )
 
-type DbConfig struct {
+type MongoDbConfig struct {
 	DbName             string `mapstructure:"db-name"`
 	Address            string `mapstructure:"address"`
 	MaxPaginationLimit int64  `mapstructure:"max-pagination-limit"`
@@ -18,7 +18,7 @@ type DbConfig struct {
 	LogicalShardCount  int64  `mapstructure:"logical-shard-count"`
 }
 
-func (cfg *DbConfig) Validate() error {
+func (cfg *MongoDbConfig) Validate() error {
 	if cfg.Address == "" {
 		return fmt.Errorf("missing db address")
 	}

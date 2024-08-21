@@ -4,14 +4,14 @@ server:
   write-timeout: 60s
   read-timeout: 60s
   idle-timeout: 60s
-  allowed-origins: [ "*" ]
+  allowed-origins: ["*"]
   log-level: error
   btc-net: "signet"
   max-content-length: 4096
   health-check-interval: 2
 db:
   address: "mongodb://localhost:27017"
-  db-name: staking-api-service
+  db-name: xchains-api
   max-pagination-limit: 10
   db-batch-size-limit: 100
   logical-shard-count: 2

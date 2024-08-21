@@ -1,10 +1,10 @@
 DOCKER = $(shell which docker)
 
-.PHONY: staking-api-service staking-api-service-rmi
+.PHONY: xchains-api xchains-api-rmi
 
-staking-api-service:
-	$(DOCKER) build --tag babylonchain/staking-api-service -f staking-api-service/Dockerfile \
+xchains-api:
+	$(DOCKER) build --tag scalarorg/xchains-api -f xchains-api/Dockerfile \
 				$(shell git rev-parse --show-toplevel)
 
-staking-api-service-rmi:
-	$(DOCKER) rmi babylonchain/staking-api-service 2>/dev/null; true
+xchains-api-rmi:
+	$(DOCKER) rmi scalarorg/xchains-api 2>/dev/null; true

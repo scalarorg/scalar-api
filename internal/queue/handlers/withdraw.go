@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/babylonchain/staking-api-service/internal/types"
-	"github.com/babylonchain/staking-api-service/internal/utils"
-	queueClient "github.com/babylonchain/staking-queue-client/client"
 	"github.com/rs/zerolog/log"
+	queueClient "github.com/scalarorg/staking-queue-client/client"
+	"github.com/scalarorg/xchains-api/internal/types"
+	"github.com/scalarorg/xchains-api/internal/utils"
 )
 
 func (h *QueueHandler) WithdrawStakingHandler(ctx context.Context, messageBody string) *types.Error {

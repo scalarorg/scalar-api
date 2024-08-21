@@ -13,24 +13,24 @@ import (
 	"testing"
 	"time"
 
-	"github.com/babylonchain/staking-queue-client/client"
 	"github.com/go-chi/chi"
 	"github.com/rabbitmq/amqp091-go"
+	"github.com/scalarorg/staking-queue-client/client"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	queueConfig "github.com/babylonchain/staking-queue-client/config"
+	queueConfig "github.com/scalarorg/staking-queue-client/config"
 
-	"github.com/babylonchain/staking-api-service/internal/api"
-	"github.com/babylonchain/staking-api-service/internal/api/middlewares"
-	"github.com/babylonchain/staking-api-service/internal/config"
-	"github.com/babylonchain/staking-api-service/internal/db"
-	"github.com/babylonchain/staking-api-service/internal/observability/metrics"
-	"github.com/babylonchain/staking-api-service/internal/queue"
-	"github.com/babylonchain/staking-api-service/internal/services"
-	"github.com/babylonchain/staking-api-service/internal/types"
+	"github.com/scalarorg/xchains-api/internal/api"
+	"github.com/scalarorg/xchains-api/internal/api/middlewares"
+	"github.com/scalarorg/xchains-api/internal/config"
+	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/observability/metrics"
+	"github.com/scalarorg/xchains-api/internal/queue"
+	"github.com/scalarorg/xchains-api/internal/services"
+	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 type TestServerDependency struct {
@@ -170,13 +170,13 @@ func PurgeAllCollections(ctx context.Context, client *mongo.Client, databaseName
 // setupTestDB connects to MongoDB and purges all collections.
 func setupTestDB(cfg config.Config) *mongo.Client {
 	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(cfg.Db.Address))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(cfg.MongoDb.Address))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Purge all collections in the test database
-	if err := PurgeAllCollections(context.TODO(), client, cfg.Db.DbName); err != nil {
+	if err := PurgeAllCollections(context.TODO(), client, cfg.MongoDb.DbName); err != nil {
 		log.Fatal("Failed to purge database:", err)
 	}
 
@@ -266,18 +266,18 @@ func sendTestMessage[T any](client client.QueueClient, data []T) error {
 	return nil
 }
 
-func directDbConnection(t *testing.T) (*db.Database) {
+func directDbConnection(t *testing.T) *db.Database {
 	cfg, err := config.New("./config/config-test.yml")
 	if err != nil {
 		t.Fatalf("Failed to load test config: %v", err)
 	}
 	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(cfg.Db.Address))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(cfg.MongoDb.Address))
 	if err != nil {
 		log.Fatal(err)
 	}
 	return &db.Database{
-		DbName: cfg.Db.DbName,
+		DbName: cfg.MongoDb.DbName,
 		Client: client,
 	}
 }
@@ -294,7 +294,7 @@ func injectDbDocuments[T any](t *testing.T, collectionName string, doc T) {
 
 // Inspect the items in the real database
 func inspectDbDocuments[T any](t *testing.T, collectionName string) ([]T, error) {
-		connection := directDbConnection(t)
+	connection := directDbConnection(t)
 	collection := connection.Client.Database(connection.DbName).Collection(collectionName)
 
 	cursor, err := collection.Find(context.Background(), bson.D{})
@@ -320,7 +320,7 @@ func buildActiveStakingEvent(t *testing.T, numOfEvenet int) []*client.ActiveStak
 	var activeStakingEvents []*client.ActiveStakingEvent
 	stakerPk, err := randomPk()
 	require.NoError(t, err)
-	// To be replaced with https://github.com/babylonchain/staking-api-service/issues/21
+	// To be replaced with https://github.com/scalarorg/xchains-api/issues/21
 	rand.New(rand.NewSource(time.Now().Unix()))
 
 	for i := 0; i < numOfEvenet; i++ {
