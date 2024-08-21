@@ -8,6 +8,7 @@ import (
 
 	"github.com/scalarorg/xchains-api/internal/config"
 	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/db/postgres"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -15,6 +16,7 @@ import (
 // the database and other external clients (if any).
 type Services struct {
 	DbClient          db.DBClient
+	PgClient          postgres.PostgresClient
 	cfg               *config.Config
 	params            *types.GlobalParams
 	finalityProviders []types.FinalityProviderDetails
@@ -27,12 +29,14 @@ func New(
 	finalityProviders []types.FinalityProviderDetails,
 ) (*Services, error) {
 	dbClient, err := db.New(ctx, cfg.MongoDb)
+	pgClient, err := postgres.New(ctx, cfg.PostgresDb)
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating db client")
 		return nil, err
 	}
 	return &Services{
 		DbClient:          dbClient,
+		PgClient:          *pgClient,
 		cfg:               cfg,
 		params:            globalParams,
 		finalityProviders: finalityProviders,

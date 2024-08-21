@@ -21,7 +21,7 @@ postgresdb:
   db-name: "xchains-indexer"
   user: "postgres"
   password: "postgres"
-  log-level: "debug"
+  log-level: "info"
 queue:
   queue_user: user # can be replaced by values in .env file
   queue_password: password
