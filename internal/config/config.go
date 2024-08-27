@@ -10,11 +10,12 @@ import (
 )
 
 type Config struct {
-	Server     ServerConfig      `mapstructure:"server"`
-	MongoDb    MongoDbConfig     `mapstructure:"mongodb"`
-	PostgresDb PostgresDBConfig  `mapstructure:"postgresdb"`
-	Queue      queue.QueueConfig `mapstructure:"queue"`
-	Metrics    MetricsConfig     `mapstructure:"metrics"`
+	Server    ServerConfig      `mapstructure:"server"`
+	MongoDb   MongoDbConfig     `mapstructure:"mongodb"`
+	IndexerDb PostgresDBConfig  `mapstructure:"indexerdb"`
+	RelayerDb PostgresDBConfig  `mapstructure:"relayerdb"`
+	Queue     queue.QueueConfig `mapstructure:"queue"`
+	Metrics   MetricsConfig     `mapstructure:"metrics"`
 }
 
 func (cfg *Config) Validate() error {
@@ -26,7 +27,11 @@ func (cfg *Config) Validate() error {
 		return err
 	}
 
-	if err := cfg.PostgresDb.Validate(); err != nil {
+	if err := cfg.IndexerDb.Validate(); err != nil {
+		return err
+	}
+
+	if err := cfg.RelayerDb.Validate(); err != nil {
 		return err
 	}
 

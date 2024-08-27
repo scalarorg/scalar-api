@@ -12,7 +12,7 @@ import (
 
 type PostgresClient struct {
 	DbName string
-	Client *gorm.DB
+	Db     *gorm.DB
 	cfg    config.PostgresDBConfig
 }
 
@@ -32,7 +32,7 @@ func New(ctx context.Context, cfg config.PostgresDBConfig) (*PostgresClient, err
 
 	return &PostgresClient{
 		DbName: cfg.DbName,
-		Client: db,
+		Db:     db,
 		cfg:    cfg,
 	}, err
 }

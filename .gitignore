@@ -219,3 +219,4 @@ tests/__debug*
 
 rabbitmq_data
 postgres_data
+data

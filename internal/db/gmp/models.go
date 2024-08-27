@@ -1,4 +1,4 @@
-package postgres
+package gmp
 
 type Tx struct {
 	ID      uint `gorm:"primaryKey"`
@@ -57,7 +57,13 @@ type ReceiptDocument struct {
 }
 
 type ReturnValuesDocument struct {
+	CommandID                  string `json:"commandId,omitempty"`
+	SourceTxHash               string `json:"sourceTxHash,omitempty"`
+	SourceAddress              string `json:"sourceAddress,omitempty"`
+	SourceChain                string `json:"sourceChain,omitempty"`
+	SourceEventIndex           string `json:"sourceEventIndex,omitempty"`
 	Sender                     string `json:"sender,omitempty"`
+	ContractAddress            string `json:"contractAddress,omitempty"`
 	DestinationChain           string `json:"destinationChain,omitempty"`
 	DestinationContractAddress string `json:"destinationContractAddress,omitempty"`
 	PayloadHash                string `json:"payloadHash,omitempty"`
@@ -87,6 +93,7 @@ type TransactionDocument struct {
 
 type GMPStepDocument struct {
 	Chain                string               `json:"chain,omitempty"`
+	SourceChain          string               `json:"sourceChain,omitempty"`
 	ContractAddress      string               `json:"contract_address,omitempty"`
 	Address              string               `json:"address,omitempty"`
 	Topics               []string             `json:"topics,omitempty"`
@@ -242,4 +249,5 @@ type GMPDocument struct {
 	SimplifiedStatus                      string                      `json:"simplified_status,omitempty"`
 	GasStatus                             string                      `json:"gas_status,omitempty"`
 	IsTwoWay                              bool                        `json:"is_two_way,omitempty"`
+	CreatedAtDocument
 }

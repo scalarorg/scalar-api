@@ -125,3 +125,12 @@ func (h *Handler) GetGMPDataMapping(request *http.Request) (*Result, *types.Erro
 	}
 	return NewResult(gmps), nil
 }
+
+func (h *Handler) EstimateTimeSpent(request *http.Request) (*Result, *types.Error) {
+	gmpPayload, err := parseGmpPayload(request)
+	gmps, err := h.services.GMPSearch(request.Context(), gmpPayload)
+	if err != nil {
+		return nil, err
+	}
+	return NewResult(gmps), nil
+}

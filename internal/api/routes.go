@@ -47,5 +47,6 @@ func registerGmpHandler(r *chi.Mux, handlers *handlers.Handler) {
 	r.Post("/v1/gmp/getContracts", registerHandler(handlers.GmpGetContracts))
 	r.Post("/v1/gmp/getConfigurations", registerHandler(handlers.GmpGetConfigurations))
 	r.Post("/v1/gmp/getDataMapping", registerHandler(handlers.GetGMPDataMapping))
+	r.Post("/v1/gmp/estimateTimeSpent", registerHandler(handlers.EstimateTimeSpent))
 
 }
