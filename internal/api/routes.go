@@ -34,7 +34,19 @@ func registerDAppHandler(r *chi.Mux, handlers *handlers.Handler) {
 	r.Delete("/v1/dApp", registerHandler(handlers.DeleteDApp))
 }
 func registerGmpHandler(r *chi.Mux, handlers *handlers.Handler) {
-	r.Post("/v1/gmp/searchGMP", registerHandler(handlers.GmpSearchGmps))
+	r.Post("/v1/gmp/GMPStats", registerHandler(handlers.GMPStats))
+	r.Post("/v1/gmp/GMPStatsAVGTimes", registerHandler(handlers.GMPStatsAVGTimes))
+	r.Post("/v1/gmp/GMPChart", registerHandler(handlers.GMPChart))
+	r.Post("/v1/gmp/GMPCumulativeVolume", registerHandler(handlers.GMPCumulativeVolume))
+	r.Post("/v1/gmp/GMPTotalVolume", registerHandler(handlers.GMPTotalVolume))
+	r.Post("/v1/gmp/GMPTotalFee", registerHandler(handlers.GMPTotalFee))
+	r.Post("/v1/gmp/GMPTotalActiveUsers", registerHandler(handlers.GMPTotalActiveUsers))
+	r.Post("/v1/gmp/GMPTopUsers", registerHandler(handlers.GMPTopUsers))
+	r.Post("/v1/gmp/GMPTopITSAssets", registerHandler(handlers.GMPTopITSAssets))
+	r.Post("/v1/gmp/searchGMP", registerHandler(handlers.GMPSearch))
 	r.Post("/v1/gmp/getContracts", registerHandler(handlers.GmpGetContracts))
-	r.Get("/v1/gmp/getConfigurations", registerHandler(handlers.GmpGetConfigurations))
+	r.Post("/v1/gmp/getConfigurations", registerHandler(handlers.GmpGetConfigurations))
+	r.Post("/v1/gmp/getDataMapping", registerHandler(handlers.GetGMPDataMapping))
+	r.Post("/v1/gmp/estimateTimeSpent", registerHandler(handlers.EstimateTimeSpent))
+
 }

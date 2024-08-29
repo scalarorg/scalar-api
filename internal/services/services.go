@@ -8,6 +8,8 @@ import (
 
 	"github.com/scalarorg/xchains-api/internal/config"
 	"github.com/scalarorg/xchains-api/internal/db"
+	"github.com/scalarorg/xchains-api/internal/db/gmp"
+	"github.com/scalarorg/xchains-api/internal/db/postgres"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -15,6 +17,7 @@ import (
 // the database and other external clients (if any).
 type Services struct {
 	DbClient          db.DBClient
+	GmpClient         gmp.GmpClient
 	cfg               *config.Config
 	params            *types.GlobalParams
 	finalityProviders []types.FinalityProviderDetails
@@ -28,11 +31,24 @@ func New(
 ) (*Services, error) {
 	dbClient, err := db.New(ctx, cfg.MongoDb)
 	if err != nil {
-		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating db client")
+		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating mongodb client")
 		return nil, err
 	}
+	indexer, err := postgres.New(ctx, cfg.IndexerDb)
+	if err != nil {
+		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating Indexer client")
+		return nil, err
+	}
+	relayer, err := postgres.New(ctx, cfg.RelayerDb)
+	if err != nil {
+		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating Relayer client")
+		return nil, err
+	}
+	gmpClient := gmp.New(indexer, relayer)
+
 	return &Services{
 		DbClient:          dbClient,
+		GmpClient:         *gmpClient,
 		cfg:               cfg,
 		params:            globalParams,
 		finalityProviders: finalityProviders,

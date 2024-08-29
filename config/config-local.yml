@@ -15,10 +15,18 @@ mongodb:
   max-pagination-limit: 10
   db-batch-size-limit: 100
   logical-shard-count: 2
-postgresdb:
+indexerdb:
   host: "localhost"
   port: 5452
   db-name: "xchains-indexer"
+  user: "postgres"
+  password: "postgres"
+  log-level: "info"
+
+relayerdb:
+  host: "localhost"
+  port: 5432
+  db-name: "relayer"
   user: "postgres"
   password: "postgres"
   log-level: "debug"

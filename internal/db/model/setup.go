@@ -51,7 +51,8 @@ var collections = map[string][]index{
 
 func Setup(ctx context.Context, cfg *config.Config) error {
 	fmt.Printf("MongoDB Address %s", cfg.MongoDb.Address)
-	fmt.Printf("PostgresDB Address %s:%d", cfg.PostgresDb.Host, cfg.PostgresDb.Port)
+	fmt.Printf("Indexer Address %s:%d", cfg.IndexerDb.Host, cfg.IndexerDb.Port)
+	fmt.Printf("Relayer Address %s:%d", cfg.RelayerDb.Host, cfg.RelayerDb.Port)
 	clientOps := options.Client().ApplyURI(cfg.MongoDb.Address)
 	client, err := mongo.Connect(ctx, clientOps)
 	if err != nil {
@@ -63,16 +64,16 @@ func Setup(ctx context.Context, cfg *config.Config) error {
 	defer cancel()
 
 	// Access a database and create collections.
-	database := client.Database(cfg.MongoDb.DbName)
+	mongoDb := client.Database(cfg.MongoDb.DbName)
 
 	// Create collections.
 	for collection := range collections {
-		createCollection(ctx, database, collection)
+		createCollection(ctx, mongoDb, collection)
 	}
 
 	for name, idxs := range collections {
 		for _, idx := range idxs {
-			createIndex(ctx, database, name, idx)
+			createIndex(ctx, mongoDb, name, idx)
 		}
 	}
 

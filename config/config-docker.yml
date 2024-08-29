@@ -15,13 +15,22 @@ mongodb:
   max-pagination-limit: 10
   db-batch-size-limit: 100
   logical-shard-count: 10
-postgresdb:
+indexerdb:
   host: "postgresdb"
   port: 5432
   db-name: "xchains-indexer"
   user: "postgres"
   password: "postgres"
   log-level: "debug"
+
+relayerdb:
+  host: "relayer"
+  port: 5432
+  db-name: "relayer"
+  user: "postgres"
+  password: "postgres"
+  log-level: "debug"
+
 queue:
   queue_user: user # can be replaced by values in .env file
   queue_password: password

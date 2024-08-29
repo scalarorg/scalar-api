@@ -1,5 +1,9 @@
 package types
 
 type GmpPayload struct {
-	Size string `json:"size"`
+	From        int    `json:"from"`
+	Size        int    `json:"size"`
+	MessageID   string `json:"messageId"`
+	TxHash      string `json:"txHash"`
+	Granularity string `json:"granularity"`
 }
