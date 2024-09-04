@@ -15,6 +15,7 @@ mongodb:
   max-pagination-limit: 10
   db-batch-size-limit: 100
   logical-shard-count: 10
+
 indexerdb:
   host: "postgresdb"
   port: 5432
