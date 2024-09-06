@@ -8,15 +8,17 @@ import (
 )
 
 type CreateDAppRequestPayload struct {
-	ChainName     string `json:"chain_name"`
-	BTCAddressHex string `json:"btc_address_hex"`
-	PublicKeyHex  string `json:"public_key_hex"`
+	ChainName            string `json:"chain_name"`
+	BTCAddressHex        string `json:"btc_address_hex"`
+	PublicKeyHex         string `json:"public_key_hex"`
+	SmartContractAddress string `json:"smart_contract_address"` //UPDATE: New field
 }
 type UpdateDAppRequestPayload struct {
-	ID            string `json:"id"`
-	ChainName     string `json:"chain_name"`
-	BTCAddressHex string `json:"btc_address_hex"`
-	PublicKeyHex  string `json:"public_key_hex"`
+	ID                   string `json:"id"`
+	ChainName            string `json:"chain_name"`
+	BTCAddressHex        string `json:"btc_address_hex"`
+	PublicKeyHex         string `json:"public_key_hex"`
+	SmartContractAddress string `json:"smart_contract_address"` //UPDATE: New field
 }
 
 type IdRequestPayload struct {
@@ -72,7 +74,7 @@ func (h *Handler) CreateDApp(request *http.Request) (*Result, *types.Error) {
 		return nil, err
 	}
 
-	err = h.services.CreateDApp(request.Context(), payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex)
+	err = h.services.CreateDApp(request.Context(), payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +100,7 @@ func (h *Handler) UpdateDApp(request *http.Request) (*Result, *types.Error) {
 	if err != nil {
 		return nil, err
 	}
-	err = h.services.UpdateDApp(request.Context(), payload.ID, payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex)
+	err = h.services.UpdateDApp(request.Context(), payload.ID, payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress)
 	if err != nil {
 		return nil, err
 	}
