@@ -8,8 +8,8 @@ import (
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
-func (s *Services) CreateDApp(ctx context.Context, chainName, btcAddressHex, publicKeyHex string) *types.Error {
-	err := s.DbClient.SaveDApp(ctx, chainName, btcAddressHex, publicKeyHex)
+func (s *Services) CreateDApp(ctx context.Context, chainName, btcAddressHex, publicKeyHex, smartContractAddress string) *types.Error {
+	err := s.DbClient.SaveDApp(ctx, chainName, btcAddressHex, publicKeyHex, smartContractAddress)
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -25,8 +25,8 @@ func (s *Services) GetDApp(ctx context.Context) ([]*model.DAppDocument, *types.E
 	return dApps, nil
 }
 
-func (s *Services) UpdateDApp(ctx context.Context, ID, chainName, btcAddressHex, publicKeyHex string) *types.Error {
-	err := s.DbClient.UpdateDApp(ctx, ID, chainName, btcAddressHex, publicKeyHex)
+func (s *Services) UpdateDApp(ctx context.Context, ID, chainName, btcAddressHex, publicKeyHex, smartContractAddress string) *types.Error {
+	err := s.DbClient.UpdateDApp(ctx, ID, chainName, btcAddressHex, publicKeyHex, smartContractAddress)
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
