@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/scalarorg/xchains-api/internal/db/model"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -91,6 +92,9 @@ func (h *Handler) GetDApp(request *http.Request) (*Result, *types.Error) {
 	dApps, err := h.services.GetDApp(request.Context())
 	if err != nil {
 		return nil, err
+	}
+	if dApps == nil {
+		dApps = []*model.DAppDocument{}
 	}
 	return NewResult(dApps), nil
 }
