@@ -17,8 +17,8 @@ mongodb:
   logical-shard-count: 2
 indexerdb:
   host: "localhost"
-  port: 5452
-  db-name: "xchains-indexer"
+  port: 5432
+  db-name: "postgres"
   user: "postgres"
   password: "postgres"
   log-level: "info"
@@ -26,7 +26,7 @@ indexerdb:
 relayerdb:
   host: "localhost"
   port: 5432
-  db-name: "relayer"
+  db-name: "postgres"
   user: "postgres"
   password: "postgres"
   log-level: "debug"
