@@ -9,14 +9,14 @@ import (
 
 type CovenantParamsType struct {
 	CovenantPubkeys []string
-	Qorum           int
+	Quorum          int
 	Tag             string
 	Version         int
 }
 
 var CovenantParams CovenantParamsType
 
-func InitCovenantParams() {
+func initCovenantParams() {
 	covenantPubkeys := strings.Split(os.Getenv("COVENANT_PUBLIC_KEYS"), ",")
 	for i := 0; i < len(covenantPubkeys); i++ {
 		if len(covenantPubkeys[i]) != 66 {
@@ -24,16 +24,16 @@ func InitCovenantParams() {
 		}
 	}
 
-	qorumStr := os.Getenv("COVENANT_QUORUM")
-	qorum, err := strconv.Atoi(qorumStr)
+	quorumStr := os.Getenv("COVENANT_QUORUM")
+	quorum, err := strconv.Atoi(quorumStr)
 	if err != nil {
-		log.Fatalf("Invalid qorum: %s", qorumStr)
+		log.Fatalf("Invalid quorum: %s", quorumStr)
 	}
-	if qorum < 1 {
-		log.Fatalf("Invalid qorum (must bigger than 0): %d", qorum)
+	if quorum < 1 {
+		log.Fatalf("Invalid quorum (must bigger than 0): %d", quorum)
 	}
-	if qorum > len(covenantPubkeys) {
-		log.Fatalf("Invalid qorum (must smaller than or equal to the number of covenant pubkeys): %d", qorum)
+	if quorum > len(covenantPubkeys) {
+		log.Fatalf("Invalid quorum (must smaller than or equal to the number of covenant pubkeys): %d", quorum)
 	}
 
 	tagStr := os.Getenv("TAG")
@@ -50,8 +50,22 @@ func InitCovenantParams() {
 	// Initialize the CovenantParams variable
 	CovenantParams = CovenantParamsType{
 		CovenantPubkeys: covenantPubkeys,
-		Qorum:           qorum,
+		Quorum:          quorum,
 		Tag:             tagStr,
 		Version:         version,
 	}
+}
+
+func isZeroCovenantParams() bool {
+	return CovenantParams.CovenantPubkeys == nil &&
+		CovenantParams.Quorum == 0 &&
+		CovenantParams.Tag == "" &&
+		CovenantParams.Version == 0
+}
+
+func GetCovenantParamsVar() CovenantParamsType {
+	if isZeroCovenantParams() {
+		initCovenantParams()
+	}
+	return CovenantParams
 }

@@ -7,5 +7,6 @@ import (
 )
 
 func (h *Handler) GetCovenantParams(request *http.Request) (*Result, *types.Error) {
-	return NewResult(types.CovenantParams), nil
+	covenantParams := types.GetCovenantParamsVar()
+	return NewResult(covenantParams), nil
 }

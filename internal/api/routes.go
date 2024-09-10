@@ -21,12 +21,14 @@ func (a *Server) SetupRoutes(r *chi.Mux) {
 	r.Get("/v1/staker/delegation/check", registerHandler(handlers.CheckStakerDelegationExist))
 	r.Get("/v1/delegation", registerHandler(handlers.GetDelegationByTxHash))
 
-	r.Get("/v1/covenant-params", registerHandler(handlers.GetCovenantParams))
-
+	registerCovenantHandler(r, handlers)
 	registerDAppHandler(r, handlers)
 	registerGmpHandler(r, handlers)
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
+}
+func registerCovenantHandler(r *chi.Mux, handlers *handlers.Handler) {
+	r.Get("/v1/covenant/params", registerHandler(handlers.GetCovenantParams))
 }
 func registerDAppHandler(r *chi.Mux, handlers *handlers.Handler) {
 	r.Get("/v1/dApp", registerHandler(handlers.GetDApp))
