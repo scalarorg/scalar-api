@@ -22,6 +22,7 @@ func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Debug().Msg("failed to load .env file")
 	}
+	types.InitCovenantParams()
 }
 
 func main() {

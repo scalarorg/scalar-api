@@ -21,6 +21,8 @@ func (a *Server) SetupRoutes(r *chi.Mux) {
 	r.Get("/v1/staker/delegation/check", registerHandler(handlers.CheckStakerDelegationExist))
 	r.Get("/v1/delegation", registerHandler(handlers.GetDelegationByTxHash))
 
+	r.Get("/v1/covenant-params", registerHandler(handlers.GetCovenantParams))
+
 	registerDAppHandler(r, handlers)
 	registerGmpHandler(r, handlers)
 
