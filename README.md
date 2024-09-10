@@ -88,7 +88,21 @@ before the timelock of the staking transaction expires.
 git clone git@github.com:scalarorg/xchains-api.git
 ```
 
-2. Run the service:
+2. Prepare the enviroment
+
+Specify the required environment variables in the `.env` file in the root directory:
+
+```
+cp .env.sample .env
+```
+
+where,
+
+- `COVENANT_PUBLIC_KEYS` specifies the public keys of the covenants
+- `COVENANT_QUORUM` specifies the number of covenant signatures needed when unbonding
+- `TAG` and `VERSION` specify the tag and version of the staking data script
+
+3. Run the service:
 
 ```
 make run-local
@@ -100,7 +114,7 @@ OR, you can run as a docker container
 make start-xchains-api
 ```
 
-3. Open your browser and navigate to `http://localhost` to see the api server running.
+4. Open your browser and navigate to `http://localhost` to see the api server running.
 
 ### Tests
 
