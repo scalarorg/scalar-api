@@ -23,6 +23,8 @@ func (a *Server) SetupRoutes(r *chi.Mux) {
 
 	r.Get("/v1/covenant-params", registerHandler(handlers.GetCovenantParams))
 
+	r.Post("/v1/bonding", registerHandler(handlers.BondTransaction))
+
 	registerDAppHandler(r, handlers)
 	registerGmpHandler(r, handlers)
 

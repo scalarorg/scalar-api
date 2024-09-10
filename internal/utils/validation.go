@@ -90,3 +90,15 @@ func IsValidChainName(chainName string) bool {
 	chainNameRegex := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 	return chainNameRegex.MatchString(chainName)
 }
+
+func IsValidAddress(addressHex string) bool {
+	// _, err := hex.DecodeString(addressHex)
+	// return err == nil
+	return true
+}
+
+func IsValidPublicKey(publicKeyHex string) bool {
+	// _, err := hex.DecodeString(publicKeyHex)
+	// return err == nil
+	return true
+}
