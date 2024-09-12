@@ -1,6 +1,6 @@
 server:
   host: 0.0.0.0
-  port: 8092
+  port: 8090
   write-timeout: 60s
   read-timeout: 60s
   idle-timeout: 60s
@@ -17,7 +17,7 @@ mongodb:
   logical-shard-count: 2
 indexerdb:
   host: "localhost"
-  port: 5432
+  port: 5442
   db-name: "postgres"
   user: "postgres"
   password: "postgres"
@@ -25,8 +25,8 @@ indexerdb:
 
 relayerdb:
   host: "localhost"
-  port: 5432
-  db-name: "postgres"
+  port: 5442
+  db-name: "relayer"
   user: "postgres"
   password: "postgres"
   log-level: "debug"

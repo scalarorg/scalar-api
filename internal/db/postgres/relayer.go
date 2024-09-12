@@ -14,14 +14,14 @@ type RelayerClient struct {
 	PgClient *PostgresClient
 }
 
-const QUERY_RELAYDATA = `SELECT rd.id, rd.status, rd.from, rd.to, rd."packetSequence", rd."executeHash", rd."createdAt", rd."updatedAt", 
-				c."blockNumber" as c_blockNumber, c."contractAddress" as c_contractAddress, c.payload as c_payload, c."payloadHash" as c_payloadHash, c."sourceAddress" as c_sourceAddress,				
-				ca."sourceChain" as ca_sourceChain, ca."destinationChain" as ca_destinationChain, ca."txHash" as ca_txHash, ca."blockNumber" as ca_blockNumber, ca."logIndex" as ca_logIndex, ca."sourceAddress" as ca_sourceAddress, 
-				ca."contractAddress" as ca_contractAddress, ca."sourceTxHash" as ca_sourceTxHash, ca."sourceEventId" as ca_sourceEventId, ca."payloadHash" as ca_payloadHash, ca."commandId" as ca_commandId,
-				ct."contractAddress" as ct_contractAddress, ct.amount as ct_amount, ct.symbol as ct_symbol, ct.payload as ct_payload, ct."payloadHash" as ct_payloadHash, ct."sourceAddress" as ct_sourceAddress		
+const QUERY_RELAYDATA = `SELECT rd.id, rd.status, rd.from, rd.to, rd."packetSequence", rd."executeHash", rd."createdAt", rd."updatedAt",
+				c."blockNumber" as c_blockNumber, c."contractAddress" as c_contractAddress, c.payload as c_payload, c."payloadHash" as c_payloadHash, c."sourceAddress" as c_sourceAddress,
+				ca."sourceChain" as ca_sourceChain, ca."destinationChain" as ca_destinationChain, ca."txHash" as ca_txHash, ca."blockNumber" as ca_blockNumber, ca."logIndex" as ca_logIndex, ca."sourceAddress" as ca_sourceAddress,
+				ca."contractAddress" as ca_contractAddress, ca."sourceTxHash" as ca_sourceTxHash, ca."sourceEventIndex" as ca_sourceEventIndex, ca."payloadHash" as ca_payloadHash, ca."commandId" as ca_commandId,
+				ct."contractAddress" as ct_contractAddress, ct.amount as ct_amount, ct.symbol as ct_symbol, ct.payload as ct_payload, ct."payloadHash" as ct_payloadHash, ct."sourceAddress" as ct_sourceAddress
 				FROM "RelayData" as rd
-					LEFT JOIN "CallContract" as c ON c.id = rd.id 
-					LEFT JOIN "CallContractApproved" as ca ON c.sourceAddress = ca.sourceAddress AND c."contractAddress" = ca."contractAddress" AND c."payloadHash" = ca."payloadHash"
+					LEFT JOIN "CallContract" as c ON c.id = rd.id
+					LEFT JOIN "CallContractApproved" as ca ON c."sourceAddress" = ca."sourceAddress" AND c."contractAddress" = ca."contractAddress" AND c."payloadHash" = ca."payloadHash"
 					LEFT JOIN "CallContractWithToken" as ct ON ct.id = rd.id`
 
 func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
@@ -33,7 +33,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 		options.Offset = 0
 	}
 	query := QUERY_RELAYDATA
-	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("GetRelayerDatas with EventIs: %s", options.EventId))
+	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("GetRelayerDatas with Event Id: %s", options.EventId))
 	if options.EventId != "" {
 		query = query + " WHERE rd.id = ?"
 	}
@@ -45,11 +45,11 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	} else {
 		rows, err = c.PgClient.Db.Raw(query).Rows()
 	}
-	defer rows.Close()
+	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("Query: %+v", err))
 	if err != nil {
 		return relayDatas, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		relayData := RelayData{
 			ContractCall: ContractCall{
