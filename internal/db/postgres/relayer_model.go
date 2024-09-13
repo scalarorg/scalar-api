@@ -4,6 +4,31 @@ import (
 	"database/sql"
 )
 
+type RelayDataStatus string
+
+const (
+	Pending   RelayDataStatus = "Pending"
+	Approved  RelayDataStatus = "Approved"
+	Success   RelayDataStatus = "Success"
+	Failed    RelayDataStatus = "Failed"
+	Undefined RelayDataStatus = "Undefined"
+)
+
+func ToReadableStatus(status string) RelayDataStatus {
+	switch status {
+	case "0":
+		return Pending
+	case "1":
+		return Approved
+	case "2":
+		return Success
+	case "3":
+		return Failed
+	default:
+		return Undefined
+	}
+}
+
 type RelayData struct {
 	ID                      string `gorm:"primaryKey"`
 	PacketSequence          sql.NullInt32

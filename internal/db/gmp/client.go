@@ -102,9 +102,10 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 			ID: relayData.ID,
 			// From:   relayData.From,
 			// To:     relayData.To,
-			Status: relayData.Status.String,
+			// Status: relayData.Status.String,
 			// CreatedAt: relayData.CreatedAt,
 			// UpdatedAt: relayData.UpdatedAt,
+			Status: string(postgres.ToReadableStatus(relayData.Status.String)),
 		}
 		createContractCall(gmps[index], &relayData)
 		createContractCallApproved(gmps[index], &relayData)
