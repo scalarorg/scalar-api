@@ -3,29 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	gmpDb "github.com/scalarorg/xchains-api/internal/db/gmp"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
-
-type EnhancedGMPDocument struct {
-	*gmpDb.GMPDocument
-	SimplifiedStatus string `json:"simplified_status"`
-}
-
-func NewEnhancedGMPDocument(gmp *gmpDb.GMPDocument) *EnhancedGMPDocument {
-	return &EnhancedGMPDocument{
-		GMPDocument:      gmp,
-		SimplifiedStatus: gmp.Status,
-	}
-}
-
-func NewEnhancedGMPDocuments(gmps []*gmpDb.GMPDocument) []*EnhancedGMPDocument {
-	enhancedGMPs := make([]*EnhancedGMPDocument, 0, len(gmps))
-	for _, gmp := range gmps {
-		enhancedGMPs = append(enhancedGMPs, NewEnhancedGMPDocument(gmp))
-	}
-	return enhancedGMPs
-}
 
 func (h *Handler) GMPStats(request *http.Request) (*Result, *types.Error) {
 	gmpPayload, err := parseGmpPayload(request)
@@ -144,9 +123,7 @@ func (h *Handler) GMPSearch(request *http.Request) (*Result, *types.Error) {
 		return nil, err
 	}
 
-	newGmps := NewEnhancedGMPDocuments(gmps)
-
-	return NewResult(newGmps), nil
+	return NewResult(gmps), nil
 }
 
 // No payload

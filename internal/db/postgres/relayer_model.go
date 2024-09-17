@@ -56,6 +56,7 @@ type ContractCall struct {
 	DestContractAddress  sql.NullString //Same as ContractAddress
 	Amount               sql.NullString
 	ContractCallApproved ContractCallApproved `gorm:"foreignKey:ID;references:ID"`
+	StakerPublicKey      sql.NullString       `gorm:"column:stakerPublicKey"`
 	RelayDataID          uint                 `gorm:"foreignKey:ID;references:ID"`
 }
 
