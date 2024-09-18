@@ -15,7 +15,7 @@ type RelayerClient struct {
 }
 
 const QUERY_RELAYDATA = `SELECT rd.id, rd.status, rd.from, rd.to, rd."packetSequence", rd."executeHash", rd."createdAt", rd."updatedAt",
-				c."blockNumber" as c_blockNumber, c."contractAddress" as c_contractAddress, c.payload as c_payload, c."payloadHash" as c_payloadHash, c."sourceAddress" as c_sourceAddress,
+				c."blockNumber" as c_blockNumber, c."contractAddress" as c_contractAddress, c.payload as c_payload, c."payloadHash" as c_payloadHash, c."sourceAddress" as c_sourceAddress, c."stakerPublicKey" as c_stakerPublicKey,
 				ca."sourceChain" as ca_sourceChain, ca."destinationChain" as ca_destinationChain, ca."txHash" as ca_txHash, ca."blockNumber" as ca_blockNumber, ca."logIndex" as ca_logIndex, ca."sourceAddress" as ca_sourceAddress,
 				ca."contractAddress" as ca_contractAddress, ca."sourceTxHash" as ca_sourceTxHash, ca."sourceEventIndex" as ca_sourceEventIndex, ca."payloadHash" as ca_payloadHash, ca."commandId" as ca_commandId,
 				ct."contractAddress" as ct_contractAddress, ct.amount as ct_amount, ct.symbol as ct_symbol, ct.payload as ct_payload, ct."payloadHash" as ct_payloadHash, ct."sourceAddress" as ct_sourceAddress
@@ -36,6 +36,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("GetRelayerDatas with Event Id: %s", options.EventId))
 	if options.EventId != "" {
 		query = query + " WHERE rd.id = ?"
+		// query = query + " WHERE LEFT(rd.id, 66) = ?" // because the id was formated with the tx hash + event index like: 0x123...-0
 	}
 	query = query + fmt.Sprintf(` ORDER by rd."createdAt" desc OFFSET %d LIMIT %d`, options.Offset, options.Size)
 	var rows *sql.Rows
@@ -71,6 +72,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 			&relayData.ContractCall.Payload,
 			&relayData.ContractCall.PayloadHash,
 			&relayData.ContractCall.SourceAddress,
+			&relayData.ContractCall.StakerPublicKey,
 			&relayData.ContractCall.ContractCallApproved.SourceChain,
 			&relayData.ContractCall.ContractCallApproved.DestinationChain,
 			&relayData.ContractCall.ContractCallApproved.TxHash,

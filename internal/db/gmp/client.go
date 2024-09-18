@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/scalarorg/xchains-api/internal/config"
 	"github.com/scalarorg/xchains-api/internal/db/postgres"
 	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
 	"github.com/scalarorg/xchains-api/internal/types"
@@ -71,6 +72,7 @@ func (c *GmpClient) getGMPByMessageID(ctx context.Context, messageID string, opt
 	return c.getGMPByRelayDatas(ctx, relayDatas)
 }
 func (c *GmpClient) getGMPByTxHash(ctx context.Context, txHash string, options *postgres.Options) ([]*GMPDocument, *types.Error) {
+	options.EventId = txHash
 	relayDatas, err := c.relayer.GetRelayerDatas(ctx, options)
 	if err != nil {
 		return nil, err
@@ -102,9 +104,11 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 			ID: relayData.ID,
 			// From:   relayData.From,
 			// To:     relayData.To,
-			Status: relayData.Status.String,
+			// Status: relayData.Status.String,
 			// CreatedAt: relayData.CreatedAt,
 			// UpdatedAt: relayData.UpdatedAt,
+			Status:           relayData.Status.String,
+			SimplifiedStatus: string(postgres.ToReadableStatus(relayData.Status.String)),
 		}
 		createContractCall(gmps[index], &relayData)
 		createContractCallApproved(gmps[index], &relayData)
@@ -146,6 +150,13 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 
 func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
 	parts := strings.Split(relayData.ID, "-")
+
+	stakerAddress, err := config.GetTaprootAddress(relayData.From.String, relayData.ContractCall.StakerPublicKey.String)
+	if err != nil {
+		stakerAddress = relayData.From.String
+		fmt.Printf("[ERROR] Failed to create Taproot address: %v", err)
+	}
+
 	call := GMPStepDocument{
 		ID:              relayData.ID,
 		Chain:           relayData.From.String,
@@ -153,8 +164,7 @@ func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
 		ContractAddress: relayData.ContractCall.ContractAddress.String,
 		Transaction: TransactionDocument{
 			Hash: parts[0],
-			//Xchains Todo: This field fill to Sender on the UI
-			//From: relayData.From.String,
+			From: stakerAddress,
 		},
 		ReturnValues: ReturnValuesDocument{
 			DestinationChain: relayData.To.String,
