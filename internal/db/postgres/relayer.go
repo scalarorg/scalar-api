@@ -35,7 +35,8 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	query := QUERY_RELAYDATA
 	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("GetRelayerDatas with Event Id: %s", options.EventId))
 	if options.EventId != "" {
-		query = query + " WHERE LEFT(rd.id, 66) = ?" // because the id was formated with the tx hash + event index like: 0x123...-0
+		query = query + " WHERE rd.id = ?"
+		// query = query + " WHERE LEFT(rd.id, 66) = ?" // because the id was formated with the tx hash + event index like: 0x123...-0
 	}
 	query = query + fmt.Sprintf(` ORDER by rd."createdAt" desc OFFSET %d LIMIT %d`, options.Offset, options.Size)
 	var rows *sql.Rows
