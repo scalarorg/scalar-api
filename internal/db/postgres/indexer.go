@@ -19,6 +19,7 @@ type Options struct {
 	EventId    string
 	EventType  string
 	EventTypes []string
+	StakerPubkey string
 }
 type MapBlockEventAttributes map[string]string
 

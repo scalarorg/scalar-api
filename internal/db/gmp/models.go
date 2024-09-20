@@ -97,11 +97,11 @@ type GMPStepDocument struct {
 	ContractAddress      string               `json:"contract_address,omitempty"`
 	Address              string               `json:"address,omitempty"`
 	Topics               []string             `json:"topics,omitempty"`
-	BlockNumber          uint64               `json:"blockNumber,omitempty"`
+	BlockNumber          uint64               `json:"blockNumber"`
 	TransactionHash      string               `json:"transactionHash,omitempty"`
 	TransactionIndex     uint                 `json:"transactionIndex,omitempty"`
 	BlockHash            string               `json:"blockHash,omitempty"`
-	LogIndex             uint                 `json:"logIndex,omitempty"`
+	LogIndex             uint                 `json:"logIndex"`
 	Removed              bool                 `json:"removed,omitempty"`
 	ID                   string               `json:"id,omitempty"`
 	Event                string               `json:"event,omitempty"`
@@ -111,10 +111,10 @@ type GMPStepDocument struct {
 	DestinationChainType string               `json:"destination_chain_type,omitempty"`
 	CreatedAt            CreatedAtDocument    `json:"created_at,omitempty"`
 	EventIndex           uint                 `json:"eventIndex,omitempty"`
-	BlockTimestamp       int64                `json:"block_timestamp,omitempty"`
+	BlockTimestamp       int64                `json:"block_timestamp"`
 	Receipt              ReceiptDocument      `json:"receipt,omitempty"`
 	Transaction          TransactionDocument  `json:"transaction,omitempty"`
-	LogIndexAlias        uint                 `json:"_logIndex,omitempty"`
+	LogIndexAlias        uint                 `json:"_logIndex"`
 	TypeAlias            string               `json:"_type,omitempty"`
 	ProposalId           string               `json:"proposal_id,omitempty"`
 }

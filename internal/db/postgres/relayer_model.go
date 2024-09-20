@@ -48,6 +48,7 @@ type ContractCall struct {
 	CreatedAt            sql.NullTime
 	UpdatedAt            sql.NullTime
 	BlockNumber          sql.NullInt32  `gorm:"column:blockNumber"`
+	LogIndex             sql.NullInt32  `gorm:"column:logIndex"`
 	ContractAddress      sql.NullString `gorm:"column:contractAddress"`
 	Payload              sql.NullString
 	PayloadHash          sql.NullString
@@ -58,6 +59,8 @@ type ContractCall struct {
 	ContractCallApproved ContractCallApproved `gorm:"foreignKey:ID;references:ID"`
 	StakerPublicKey      sql.NullString       `gorm:"column:stakerPublicKey"`
 	RelayDataID          uint                 `gorm:"foreignKey:ID;references:ID"`
+	TxHash               sql.NullString       `gorm:"column:txHash"`
+	TxHex                []byte               `gorm:"column:txHex"`
 }
 
 type ContractCallWithToken struct {
