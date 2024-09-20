@@ -27,7 +27,7 @@ $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
 
-.PHONY: build install tests
+.PHONY: build install tests debug-local run-local run-unprocessed-events-replay-local generate-mock-interface build-swagger
 
 build-docker:
 	$(MAKE) BBN_PRIV_DEPLOY_KEY=${BBN_PRIV_DEPLOY_KEY} -C contrib/images xchains-api
@@ -42,6 +42,11 @@ run-local:
 	./bin/local-startup.sh;
 	sleep 5;
 	go run cmd/xchains-api/main.go \
+		--config config/config-local.yml \
+		--params config/global-params.json \
+		--finality-providers config/finality-providers.json
+debug-local:
+	@go run cmd/xchains-api/main.go \
 		--config config/config-local.yml \
 		--params config/global-params.json \
 		--finality-providers config/finality-providers.json

@@ -22,6 +22,7 @@ const (
 	EVENT_TYPE_XCHAINS_CONFIRM          string = "xchains.confirm"
 )
 
+// TODO: refactor db client
 type GmpClient struct {
 	indexer *postgres.IndexerClient
 	relayer *postgres.RelayerClient
@@ -65,6 +66,7 @@ func (c *GmpClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([
 	return c.getGMPByRelayDatas(ctx, relayDatas)
 }
 func (c *GmpClient) getGMPByMessageID(ctx context.Context, messageID string, options *postgres.Options) ([]*GMPDocument, *types.Error) {
+	options.EventId = messageID
 	relayDatas, err := c.relayer.GetRelayerDatas(ctx, options)
 	if err != nil {
 		return nil, err
@@ -72,7 +74,6 @@ func (c *GmpClient) getGMPByMessageID(ctx context.Context, messageID string, opt
 	return c.getGMPByRelayDatas(ctx, relayDatas)
 }
 func (c *GmpClient) getGMPByTxHash(ctx context.Context, txHash string, options *postgres.Options) ([]*GMPDocument, *types.Error) {
-	options.EventId = txHash
 	relayDatas, err := c.relayer.GetRelayerDatas(ctx, options)
 	if err != nil {
 		return nil, err
@@ -149,8 +150,6 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 }
 
 func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
-	parts := strings.Split(relayData.ID, "-")
-
 	stakerAddress, err := config.GetTaprootAddress(relayData.From.String, relayData.ContractCall.StakerPublicKey.String)
 	if err != nil {
 		stakerAddress = relayData.From.String
@@ -163,22 +162,19 @@ func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
 		Event:           normalizeEventType(EVENT_TYPE_CONTRACT_CALL),
 		ContractAddress: relayData.ContractCall.ContractAddress.String,
 		Transaction: TransactionDocument{
-			Hash: parts[0],
+			Hash: relayData.ContractCall.TxHash.String,
 			From: stakerAddress,
 		},
 		ReturnValues: ReturnValuesDocument{
 			DestinationChain: relayData.To.String,
 		},
 		BlockNumber:     uint64(relayData.ContractCall.BlockNumber.Int32),
-		TransactionHash: parts[0],
+		TransactionHash: relayData.ContractCall.TxHash.String,
 		//XChains Todo: Created
 		BlockTimestamp: relayData.CreatedAt.Time.Unix(),
+		LogIndex:       uint(relayData.ContractCall.LogIndex.Int32),
 	}
-	if len(parts) > 1 {
-		if index, err := strconv.Atoi(parts[1]); err == nil {
-			call.LogIndex = uint(index)
-		}
-	}
+
 	if relayData.ContractCall.ContractAddress.Valid {
 		call.ContractAddress = relayData.ContractCall.ContractAddress.String
 		call.ReturnValues.Sender = relayData.ContractCall.SourceAddress.String

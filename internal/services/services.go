@@ -10,14 +10,18 @@ import (
 	"github.com/scalarorg/xchains-api/internal/db"
 	"github.com/scalarorg/xchains-api/internal/db/gmp"
 	"github.com/scalarorg/xchains-api/internal/db/postgres"
+	"github.com/scalarorg/xchains-api/internal/db/vault"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 // Service layer contains the business logic and is used to interact with
 // the database and other external clients (if any).
 type Services struct {
-	DbClient          db.DBClient
-	GmpClient         gmp.GmpClient
+	DbClient  db.DBClient
+	GmpClient gmp.GmpClient
+
+	// TODO: fix me
+	VaultClient       vault.VaultClient
 	cfg               *config.Config
 	params            *types.GlobalParams
 	finalityProviders []types.FinalityProviderDetails
@@ -45,10 +49,12 @@ func New(
 		return nil, err
 	}
 	gmpClient := gmp.New(indexer, relayer)
+	vaultClient := vault.New(relayer)
 
 	return &Services{
 		DbClient:          dbClient,
 		GmpClient:         *gmpClient,
+		VaultClient:       *vaultClient,
 		cfg:               cfg,
 		params:            globalParams,
 		finalityProviders: finalityProviders,
