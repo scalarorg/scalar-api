@@ -18,7 +18,7 @@ const QUERY_RELAYDATA = `
 SELECT 
     rd.id, rd.status, rd.from, rd.to, rd."packetSequence", rd."executeHash", rd."createdAt", rd."updatedAt",
     c.c_blockNumber, c.c_txHash,
-    c.c_logIndex, c.c_contractAddress, c.c_payload, c.c_payloadHash, c.c_sourceAddress, c.c_stakerPublicKey,
+    c.c_logIndex, c.c_contractAddress, c.c_payload, c.c_payloadHash, c.c_sourceAddress, c.c_stakerPublicKey, c_senderAddress, c.c_amount,
     ca.ca_sourceChain, ca.ca_destinationChain, ca.ca_txHash, ca.ca_blockNumber, ca.ca_logIndex, ca.ca_sourceAddress,
     ca.ca_contractAddress, ca.ca_sourceTxHash, ca.ca_sourceEventIndex, ca.ca_payloadHash, ca.ca_commandId,
     ct.ct_contractAddress, ct.ct_amount, ct.ct_symbol, ct.ct_payload, ct.ct_payloadHash, ct.ct_sourceAddress
@@ -35,6 +35,8 @@ LEFT JOIN (
         c."payloadHash" as c_payloadHash, 
         c."sourceAddress" as c_sourceAddress, 
         c."stakerPublicKey" as c_stakerPublicKey,
+		c."senderAddress" as c_senderAddress,
+		c."amount" as c_amount,
         ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY c."blockNumber") as rn
     FROM "CallContract" c
 ) c ON rd.id = c.id AND c.rn = 1
@@ -121,6 +123,8 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 			&relayData.ContractCall.PayloadHash,
 			&relayData.ContractCall.SourceAddress,
 			&relayData.ContractCall.StakerPublicKey,
+			&relayData.ContractCall.SenderAddress,
+			&relayData.ContractCall.Amount,
 			&relayData.ContractCall.ContractCallApproved.SourceChain,
 			&relayData.ContractCall.ContractCallApproved.DestinationChain,
 			&relayData.ContractCall.ContractCallApproved.TxHash,
@@ -196,23 +200,29 @@ const QUERY_VAULT_RELAYDATA = `
 SELECT 
     rd.id, rd.status, rd.from, rd.to, rd."packetSequence", rd."executeHash", rd."createdAt", rd."updatedAt",
     c.c_blockNumber, c.c_txHash, c.c_txHex,
-    c.c_logIndex, c.c_contractAddress, c.c_payload, c.c_payloadHash, c.c_sourceAddress, c.c_stakerPublicKey
+    c.c_logIndex, c.c_contractAddress, c.c_payload, c.c_payloadHash, c.c_sourceAddress, c.c_stakerPublicKey, c.c_amount,
+    ce.ce_amount
 FROM "RelayData" rd
 JOIN (
     SELECT 
         c.id,
         c."blockNumber" as c_blockNumber, 
-		c."txHash" as c_txHash,
-		c."txHex" as c_txHex,
+                c."txHash" as c_txHash,
+                c."txHex" as c_txHex,
         c."logIndex" as c_logIndex, 
         c."contractAddress" as c_contractAddress, 
         c.payload as c_payload, 
         c."payloadHash" as c_payloadHash, 
         c."sourceAddress" as c_sourceAddress, 
-        c."stakerPublicKey" as c_stakerPublicKey
+        c."stakerPublicKey" as c_stakerPublicKey,
+                c."amount" as c_amount
     FROM "CallContract" c
-) c ON rd.id = c.id WHERE rd."status" = 2
-`
+) c ON rd.id = c.id 
+LEFT JOIN (
+     SELECT ce."amount" as ce_amount,
+            ce."referenceTxHash" as ce_refTxHash
+     FROM "CommandExecuted" ce
+) ce ON ce_refTxHash = c_txHash WHERE rd."status" = 2`
 
 func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
 	var relayDatas []RelayData
@@ -265,6 +275,8 @@ func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Op
 			&relayData.ContractCall.PayloadHash,
 			&relayData.ContractCall.SourceAddress,
 			&relayData.ContractCall.StakerPublicKey,
+			&relayData.ContractCall.Amount,
+			&relayData.ContractCall.CommandExecuted.Amount,
 		)
 		if err != nil {
 			fmt.Printf("Error while scanning rows %v", err)
