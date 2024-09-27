@@ -60,9 +60,10 @@ func (c *VaultClient) getVaultByRelayData(relayData *postgres.RelayData) (*Vault
 		DestinationSmartContractAddress: relayData.ContractCall.ContractAddress.String,
 		SourceTxHash:                    relayData.ContractCall.TxHash.String,
 		SourceTxHex:                     txHex,
-		Amount:                          "is comming...", // TODO: refactor from the staking flow
+		Amount:                          relayData.ContractCall.Amount.String,
 		StakerPubkey:                    relayData.ContractCall.StakerPublicKey.String,
 		CreatedAt:                       uint64(relayData.CreatedAt.Time.Unix()),
 		UpdatedAt:                       uint64(relayData.UpdatedAt.Time.Unix()),
+		ExecutedAmount:                  relayData.ContractCall.CommandExecuted.Amount.String,
 	}, nil
 }

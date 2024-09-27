@@ -150,10 +150,16 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 }
 
 func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
-	stakerAddress, err := config.GetTaprootAddress(relayData.From.String, relayData.ContractCall.StakerPublicKey.String)
-	if err != nil {
-		stakerAddress = relayData.From.String
-		fmt.Printf("[ERROR] Failed to create Taproot address: %v", err)
+	from := ""
+	if relayData.ContractCall.StakerPublicKey.String != "" {
+		stakerAddress, err := config.GetTaprootAddress(relayData.From.String, relayData.ContractCall.StakerPublicKey.String)
+		if err != nil {
+			stakerAddress = relayData.From.String
+			fmt.Printf("[ERROR] Failed to create Taproot address: %v", err)
+		}
+		from = stakerAddress
+	} else {
+		from = relayData.ContractCall.SenderAddress.String
 	}
 
 	call := GMPStepDocument{
@@ -163,7 +169,7 @@ func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
 		ContractAddress: relayData.ContractCall.ContractAddress.String,
 		Transaction: TransactionDocument{
 			Hash: relayData.ContractCall.TxHash.String,
-			From: stakerAddress,
+			From: from,
 		},
 		ReturnValues: ReturnValuesDocument{
 			DestinationChain: relayData.To.String,
