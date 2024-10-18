@@ -67,9 +67,9 @@ type DBClient interface {
 		ctx context.Context, address string, extraFilter *DelegationFilter,
 	) (bool, error)
 
-	SaveDApp(ctx context.Context, ChainName, AddressHex, PublicKeyHex, SmartContractAddress string) error
+	SaveDApp(ctx context.Context, ChainName, AddressHex, PublicKeyHex, SmartContractAddress, ChainID, ChainEndpoint, RPCUrl, AccessToken string) error
 	GetDApp(ctx context.Context) ([]*model.DAppDocument, error)
-	UpdateDApp(ctx context.Context, ID, ChainName, AddressHex, PublicKeyHex, SmartContractAddress string) error
+	UpdateDApp(ctx context.Context, ID, ChainName, AddressHex, PublicKeyHex, SmartContractAddress, ChainID, ChainEndpoint, RPCUrl, AccessToken string) error
 	ToggleDApp(ctx context.Context, ID string) error
 	DeleteDApp(ctx context.Context, ID string) error
 
