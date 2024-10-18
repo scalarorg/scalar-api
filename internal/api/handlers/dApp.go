@@ -13,6 +13,10 @@ type CreateDAppRequestPayload struct {
 	BTCAddressHex        string `json:"btc_address_hex"`
 	PublicKeyHex         string `json:"public_key_hex"`
 	SmartContractAddress string `json:"smart_contract_address"` //UPDATE: New field
+	ChainID              string `json:"chain_id"`
+	ChainEndpoint        string `json:"chain_endpoint"`
+	RPCUrl               string `json:"rpc_url"`
+	AccessToken          string `json:"access_token"`
 }
 type UpdateDAppRequestPayload struct {
 	ID                   string `json:"id"`
@@ -20,6 +24,10 @@ type UpdateDAppRequestPayload struct {
 	BTCAddressHex        string `json:"btc_address_hex"`
 	PublicKeyHex         string `json:"public_key_hex"`
 	SmartContractAddress string `json:"smart_contract_address"` //UPDATE: New field
+	ChainID              string `json:"chain_id"`
+	ChainEndpoint        string `json:"chain_endpoint"`
+	RPCUrl               string `json:"rpc_url"`
+	AccessToken          string `json:"access_token"`
 }
 
 type IdRequestPayload struct {
@@ -75,7 +83,7 @@ func (h *Handler) CreateDApp(request *http.Request) (*Result, *types.Error) {
 		return nil, err
 	}
 
-	err = h.services.CreateDApp(request.Context(), payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress)
+	err = h.services.CreateDApp(request.Context(), payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress, payload.ChainID, payload.ChainEndpoint, payload.RPCUrl, payload.AccessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +112,7 @@ func (h *Handler) UpdateDApp(request *http.Request) (*Result, *types.Error) {
 	if err != nil {
 		return nil, err
 	}
-	err = h.services.UpdateDApp(request.Context(), payload.ID, payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress)
+	err = h.services.UpdateDApp(request.Context(), payload.ID, payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress, payload.ChainID, payload.ChainEndpoint, payload.RPCUrl, payload.AccessToken)
 	if err != nil {
 		return nil, err
 	}
