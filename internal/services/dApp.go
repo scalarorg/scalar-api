@@ -8,8 +8,30 @@ import (
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
-func (s *Services) CreateDApp(ctx context.Context, chainName, btcAddressHex, publicKeyHex, smartContractAddress, chainID, chainEndpoint, rpcUrl, accessToken string) *types.Error {
-	err := s.DbClient.SaveDApp(ctx, chainName, btcAddressHex, publicKeyHex, smartContractAddress, chainID, chainEndpoint, rpcUrl, accessToken)
+type DAppServiceParams struct {
+	ID                   string // TODO: change to ObjectID
+	ChainName            string
+	BtcAddressHex        string
+	PublicKeyHex         string
+	SmartContractAddress string
+	ChainID              string
+	ChainEndpoint        string
+	RpcUrl               string
+	AccessToken          string
+}
+
+func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
+
+	err := s.DbClient.SaveDApp(ctx, &model.DAppDocument{
+		ChainName:            params.ChainName,
+		BTCAddressHex:        params.BtcAddressHex,
+		PublicKeyHex:         params.PublicKeyHex,
+		SmartContractAddress: params.SmartContractAddress,
+		ChainID:              params.ChainID,
+		ChainEndpoint:        params.ChainEndpoint,
+		RPCUrl:               params.RpcUrl,
+		AccessToken:          params.AccessToken,
+	})
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -25,8 +47,20 @@ func (s *Services) GetDApp(ctx context.Context) ([]*model.DAppDocument, *types.E
 	return dApps, nil
 }
 
-func (s *Services) UpdateDApp(ctx context.Context, ID, chainName, btcAddressHex, publicKeyHex, smartContractAddress, chainID, chainEndpoint, rpcUrl, accessToken string) *types.Error {
-	err := s.DbClient.UpdateDApp(ctx, ID, chainName, btcAddressHex, publicKeyHex, smartContractAddress, chainID, chainEndpoint, rpcUrl, accessToken)
+func (s *Services) UpdateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
+
+	err := s.DbClient.UpdateDApp(ctx, &model.DAppDocument{
+		ID:                   params.ID,
+		ChainName:            params.ChainName,
+		BTCAddressHex:        params.BtcAddressHex,
+		PublicKeyHex:         params.PublicKeyHex,
+		SmartContractAddress: params.SmartContractAddress,
+		ChainID:              params.ChainID,
+		ChainEndpoint:        params.ChainEndpoint,
+		RPCUrl:               params.RpcUrl,
+		AccessToken:          params.AccessToken,
+	})
+
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}

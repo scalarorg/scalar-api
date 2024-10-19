@@ -67,9 +67,10 @@ type DBClient interface {
 		ctx context.Context, address string, extraFilter *DelegationFilter,
 	) (bool, error)
 
-	SaveDApp(ctx context.Context, ChainName, AddressHex, PublicKeyHex, SmartContractAddress, ChainID, ChainEndpoint, RPCUrl, AccessToken string) error
+	SaveDApp(ctx context.Context, dApp *model.DAppDocument) error
 	GetDApp(ctx context.Context) ([]*model.DAppDocument, error)
-	UpdateDApp(ctx context.Context, ID, ChainName, AddressHex, PublicKeyHex, SmartContractAddress, ChainID, ChainEndpoint, RPCUrl, AccessToken string) error
+	UpdateDApp(ctx context.Context, dApp *model.DAppDocument) error
+	// TODO: refactor the ID -> Should use ObjectID
 	ToggleDApp(ctx context.Context, ID string) error
 	DeleteDApp(ctx context.Context, ID string) error
 
