@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/scalarorg/xchains-api/internal/db/model"
+	"github.com/scalarorg/xchains-api/internal/services"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -83,7 +84,19 @@ func (h *Handler) CreateDApp(request *http.Request) (*Result, *types.Error) {
 		return nil, err
 	}
 
-	err = h.services.CreateDApp(request.Context(), payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress, payload.ChainID, payload.ChainEndpoint, payload.RPCUrl, payload.AccessToken)
+	params := services.DAppServiceParams{
+		ChainName:            payload.ChainName,
+		BtcAddressHex:        payload.BTCAddressHex,
+		PublicKeyHex:         payload.PublicKeyHex,
+		SmartContractAddress: payload.SmartContractAddress,
+		ChainID:              payload.ChainID,
+		ChainEndpoint:        payload.ChainEndpoint,
+		RpcUrl:               payload.RPCUrl,
+		AccessToken:          payload.AccessToken,
+	}
+
+	err = h.services.CreateDApp(request.Context(), params)
+
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +125,20 @@ func (h *Handler) UpdateDApp(request *http.Request) (*Result, *types.Error) {
 	if err != nil {
 		return nil, err
 	}
-	err = h.services.UpdateDApp(request.Context(), payload.ID, payload.ChainName, payload.BTCAddressHex, payload.PublicKeyHex, payload.SmartContractAddress, payload.ChainID, payload.ChainEndpoint, payload.RPCUrl, payload.AccessToken)
+
+	params := services.DAppServiceParams{
+		ID:                   payload.ID,
+		ChainName:            payload.ChainName,
+		BtcAddressHex:        payload.BTCAddressHex,
+		PublicKeyHex:         payload.PublicKeyHex,
+		SmartContractAddress: payload.SmartContractAddress,
+		ChainID:              payload.ChainID,
+		ChainEndpoint:        payload.ChainEndpoint,
+		RpcUrl:               payload.RPCUrl,
+		AccessToken:          payload.AccessToken,
+	}
+
+	err = h.services.UpdateDApp(request.Context(), params)
 	if err != nil {
 		return nil, err
 	}

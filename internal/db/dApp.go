@@ -8,19 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (db *Database) SaveDApp(ctx context.Context, chainName, addressHex, publicKeyHex, smartContractAddress, chainID, chainEndpoint, rpcUrl, accessToken string) error {
+func (db *Database) SaveDApp(ctx context.Context, dApp *model.DAppDocument) error {
 	dApps := db.Client.Database(db.DbName).Collection(model.DAppCollection)
-	dApp := model.DAppDocument{
-		ChainName:            chainName,
-		BTCAddressHex:        addressHex,
-		PublicKeyHex:         publicKeyHex,
-		SmartContractAddress: smartContractAddress,
-		State:                true,
-		ChainID:              chainID,
-		ChainEndpoint:        chainEndpoint,
-		RPCUrl:               rpcUrl,
-		AccessToken:          accessToken,
-	}
 	// insert unique dApp
 	_, err := dApps.InsertOne(ctx, dApp)
 	return err
@@ -45,23 +34,23 @@ func (db *Database) GetDApp(ctx context.Context) ([]*model.DAppDocument, error) 
 	return dAppDocuments, nil
 }
 
-func (db *Database) UpdateDApp(ctx context.Context, ID, chainName, addressHex, publicKeyHex, smartContractAddress, chainID, chainEndpoint, rpcUrl, accessToken string) error {
+func (db *Database) UpdateDApp(ctx context.Context, dApp *model.DAppDocument) error {
 	dApps := db.Client.Database(db.DbName).Collection(model.DAppCollection)
 	// convert ID to objectID
-	_id, err := primitive.ObjectIDFromHex(ID)
+	_id, err := primitive.ObjectIDFromHex(dApp.ID)
 	if err != nil {
 		return err
 	}
 	filter := bson.M{"_id": _id}
 	update := bson.M{"$set": bson.M{
-		"chain_name":             chainName,
-		"btc_address_hex":        addressHex,
-		"public_key_hex":         publicKeyHex,
-		"smart_contract_address": smartContractAddress,
-		"chain_id":               chainID,
-		"chain_endpoint":         chainEndpoint,
-		"rpc_url":                rpcUrl,
-		"access_token":           accessToken,
+		"chain_name":             dApp.ChainName,
+		"btc_address_hex":        dApp.BTCAddressHex,
+		"public_key_hex":         dApp.PublicKeyHex,
+		"smart_contract_address": dApp.SmartContractAddress,
+		"chain_id":               dApp.ChainID,
+		"chain_endpoint":         dApp.ChainEndpoint,
+		"rpc_url":                dApp.RPCUrl,
+		"access_token":           dApp.AccessToken,
 	}}
 
 	updateResult := dApps.FindOneAndUpdate(ctx, filter, update)
