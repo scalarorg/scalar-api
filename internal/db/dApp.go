@@ -51,6 +51,7 @@ func (db *Database) UpdateDApp(ctx context.Context, dApp *model.DAppDocument) er
 		"chain_endpoint":         dApp.ChainEndpoint,
 		"rpc_url":                dApp.RPCUrl,
 		"access_token":           dApp.AccessToken,
+		"token_contract_address": dApp.TokenContractAddress,
 	}}
 
 	updateResult := dApps.FindOneAndUpdate(ctx, filter, update)

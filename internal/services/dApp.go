@@ -18,6 +18,7 @@ type DAppServiceParams struct {
 	ChainEndpoint        string
 	RpcUrl               string
 	AccessToken          string
+	TokenContractAddress string
 }
 
 func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
@@ -31,6 +32,7 @@ func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *ty
 		ChainEndpoint:        params.ChainEndpoint,
 		RPCUrl:               params.RpcUrl,
 		AccessToken:          params.AccessToken,
+		TokenContractAddress: params.TokenContractAddress,
 	})
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
@@ -59,6 +61,7 @@ func (s *Services) UpdateDApp(ctx context.Context, params DAppServiceParams) *ty
 		ChainEndpoint:        params.ChainEndpoint,
 		RPCUrl:               params.RpcUrl,
 		AccessToken:          params.AccessToken,
+		TokenContractAddress: params.TokenContractAddress,
 	})
 
 	if err != nil {

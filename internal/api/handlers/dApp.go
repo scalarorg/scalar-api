@@ -18,6 +18,7 @@ type CreateDAppRequestPayload struct {
 	ChainEndpoint        string `json:"chain_endpoint"`
 	RPCUrl               string `json:"rpc_url"`
 	AccessToken          string `json:"access_token"`
+	TokenContractAddress string `json:"token_contract_address"`
 }
 type UpdateDAppRequestPayload struct {
 	ID                   string `json:"id"`
@@ -29,6 +30,7 @@ type UpdateDAppRequestPayload struct {
 	ChainEndpoint        string `json:"chain_endpoint"`
 	RPCUrl               string `json:"rpc_url"`
 	AccessToken          string `json:"access_token"`
+	TokenContractAddress string `json:"token_contract_address"`
 }
 
 type IdRequestPayload struct {
@@ -93,6 +95,7 @@ func (h *Handler) CreateDApp(request *http.Request) (*Result, *types.Error) {
 		ChainEndpoint:        payload.ChainEndpoint,
 		RpcUrl:               payload.RPCUrl,
 		AccessToken:          payload.AccessToken,
+		TokenContractAddress: payload.TokenContractAddress,
 	}
 
 	err = h.services.CreateDApp(request.Context(), params)
@@ -136,6 +139,7 @@ func (h *Handler) UpdateDApp(request *http.Request) (*Result, *types.Error) {
 		ChainEndpoint:        payload.ChainEndpoint,
 		RpcUrl:               payload.RPCUrl,
 		AccessToken:          payload.AccessToken,
+		TokenContractAddress: payload.TokenContractAddress,
 	}
 
 	err = h.services.UpdateDApp(request.Context(), params)
