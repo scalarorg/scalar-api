@@ -1,8 +1,8 @@
 module github.com/scalarorg/xchains-api
 
-go 1.22.3
+go 1.23
 
-toolchain go1.22.4
+toolchain go1.23.2
 
 require (
 	github.com/babylonchain/babylon v0.9.0-rc.1
@@ -132,6 +132,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
+	github.com/scalarorg/bitcoin-vault/ffi/go-psbt v0.0.0-20241101151430-e4c63d521b66 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
@@ -194,3 +195,5 @@ require (
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+replace github.com/scalarorg/bitcoin-vault/ffi/go-psbt => ../../bitcoin-vault/ffi/go-psbt
