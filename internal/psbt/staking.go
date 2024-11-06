@@ -2,57 +2,55 @@ package psbt
 
 import (
 	"context"
-	"encoding/hex"
-	"strconv"
 
-	psbtFfi "github.com/scalarorg/bitcoin-vault/ffi/go-psbt"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 func CreateUnsignedStakingPsbt(ctx context.Context, stakingRequest *types.CreateStakingRequestPayload) (*types.StakingPsbt, error) {
-	// create the p2tr script pubkey from public key
-	//const p2trScriptPubKey = publicKeyToP2trScript(stakerPubkey, network);
-	// 1. Create the staking output
-	tag := "staking"
-	version := 0
-	stakerPubkey, err := hex.DecodeString(stakingRequest.StakerPubkey)
-	if err != nil {
-		return nil, err
-	}
-	protocolPubkey, err := hex.DecodeString(stakingRequest.ServicePubkey)
-	if err != nil {
-		return nil, err
-	}
-	custodialPubkeys := []byte{}
-	// for _, custodialPubkey := range stakingRequest.CustodialPubkeys {
-	// 	custodialPubkeyBytes, err := hex.DecodeString(custodialPubkey)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	custodialPubkeys = append(custodialPubkeys, custodialPubkeyBytes)
+	// // create the p2tr script pubkey from public key
+	// //const p2trScriptPubKey = publicKeyToP2trScript(stakerPubkey, network);
+	// // 1. Create the staking output
+	// tag := "staking"
+	// version := 0
+	// stakerPubkey, err := hex.DecodeString(stakingRequest.StakerPubkey)
+	// if err != nil {
+	// 	return nil, err
 	// }
-	custodialQuorum := 3
-	haveOnlyCustodial := false
-	dstChainId, err := strconv.ParseUint(stakingRequest.DstChainId, 10, 64)
-	dstSmartContractAddress, err := hex.DecodeString(stakingRequest.DstSmartContractAddress)
-	dstUserAddress, err := hex.DecodeString(stakingRequest.DstUserAddress)
-	outputs, err := psbtFfi.CreateStakingPsbt(
-		tag,
-		version,
-		stakingRequest.StakingAmount,
-		stakerPubkey,
-		protocolPubkey,
-		custodialPubkeys,
-		custodialQuorum,
-		haveOnlyCustodial,
-		dstChainId,
-		dstSmartContractAddress,
-		dstUserAddress,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return outputs, nil
+	// protocolPubkey, err := hex.DecodeString(stakingRequest.ServicePubkey)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// custodialPubkeys := []byte{}
+	// // for _, custodialPubkey := range stakingRequest.CustodialPubkeys {
+	// // 	custodialPubkeyBytes, err := hex.DecodeString(custodialPubkey)
+	// // 	if err != nil {
+	// // 		return nil, err
+	// // 	}
+	// // 	custodialPubkeys = append(custodialPubkeys, custodialPubkeyBytes)
+	// // }
+	// custodialQuorum := 3
+	// haveOnlyCustodial := false
+	// dstChainId, err := strconv.ParseUint(stakingRequest.DstChainId, 10, 64)
+	// dstSmartContractAddress, err := hex.DecodeString(stakingRequest.DstSmartContractAddress)
+	// dstUserAddress, err := hex.DecodeString(stakingRequest.DstUserAddress)
+	// outputs, err := psbtFfi.CreateStakingPsbt(
+	// 	tag,
+	// 	version,
+	// 	stakingRequest.StakingAmount,
+	// 	stakerPubkey,
+	// 	protocolPubkey,
+	// 	custodialPubkeys,
+	// 	custodialQuorum,
+	// 	haveOnlyCustodial,
+	// 	dstChainId,
+	// 	dstSmartContractAddress,
+	// 	dstUserAddress,
+	// )
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return outputs, nil
+	return nil, nil
 }
 
 // func BuildUnsignedStakingPsbt(

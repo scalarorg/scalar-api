@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/scalarorg/xchains-api/internal/config"
 	"github.com/scalarorg/xchains-api/internal/db/postgres"
 	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
 	"github.com/scalarorg/xchains-api/internal/types"
@@ -150,17 +149,18 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 }
 
 func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
-	from := ""
-	if relayData.ContractCall.StakerPublicKey.String != "" {
-		stakerAddress, err := config.GetTaprootAddress(relayData.From.String, relayData.ContractCall.StakerPublicKey.String)
-		if err != nil {
-			stakerAddress = relayData.From.String
-			fmt.Printf("[ERROR] Failed to create Taproot address: %v", err)
-		}
-		from = stakerAddress
-	} else {
-		from = relayData.ContractCall.SenderAddress.String
-	}
+	from := relayData.ContractCall.SenderAddress.String
+	// Nov 11, Taivv: SenderAddress is stored using electrum indexer, get from first txin.script_pubkey
+	// if relayData.ContractCall.StakerPublicKey.String != "" {
+	// 	stakerAddress, err := config.GetTaprootAddress(relayData.From.String, relayData.ContractCall.StakerPublicKey.String)
+	// 	if err != nil {
+	// 		stakerAddress = relayData.From.String
+	// 		fmt.Printf("[ERROR] Failed to create Taproot address: %v", err)
+	// 	}
+	// 	from = stakerAddress
+	// } else {
+	// 	from = relayData.ContractCall.SenderAddress.String
+	// }
 
 	call := GMPStepDocument{
 		ID:              relayData.ID,
