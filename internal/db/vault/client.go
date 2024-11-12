@@ -12,10 +12,10 @@ type VaultClient struct {
 	relayer *postgres.RelayerClient
 }
 
-func New(relayer *postgres.PostgresClient) *VaultClient {
+func New(scalarPostgresClient *postgres.PostgresClient) *VaultClient {
 	return &VaultClient{
 		relayer: &postgres.RelayerClient{
-			PgClient: relayer,
+			PgClient: scalarPostgresClient,
 		},
 	}
 }

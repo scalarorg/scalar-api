@@ -51,8 +51,7 @@ var collections = map[string][]index{
 
 func Setup(ctx context.Context, cfg *config.Config) error {
 	fmt.Printf("MongoDB Address %s", cfg.MongoDb.Address)
-	fmt.Printf("Indexer Address %s:%d", cfg.IndexerDb.Host, cfg.IndexerDb.Port)
-	fmt.Printf("Relayer Address %s:%d", cfg.RelayerDb.Host, cfg.RelayerDb.Port)
+	fmt.Printf("ScalarDB Address %s:%d", cfg.ScalarDb.Host, cfg.ScalarDb.Port)
 	clientOps := options.Client().ApplyURI(cfg.MongoDb.Address)
 	client, err := mongo.Connect(ctx, clientOps)
 	if err != nil {
@@ -119,3 +118,22 @@ func createIndex(ctx context.Context, database *mongo.Database, collectionName s
 
 	log.Debug().Msg("Index created successfully on collection: " + collectionName)
 }
+
+// func ConnectToDBAndMigrate(dbConfig config.Database) (*gorm.DB, error) {
+// 	database, err := db.PostgresDbConnect(dbConfig.Host, dbConfig.Port, dbConfig.Database, dbConfig.User, dbConfig.Password, strings.ToLower(dbConfig.LogLevel))
+// 	if err != nil {
+// 		config.Log.Fatal("Could not establish connection to the database", err)
+// 	}
+
+// 	sqldb, _ := database.DB()
+// 	sqldb.SetMaxIdleConns(10)
+// 	sqldb.SetMaxOpenConns(100)
+// 	sqldb.SetConnMaxLifetime(time.Hour)
+
+// 	err = db.MigrateModels(database)
+// 	if err != nil {
+// 		config.Log.Error("Error running DB migrations", err)
+// 	}
+
+// 	return database, err
+// }

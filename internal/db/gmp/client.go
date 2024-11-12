@@ -27,13 +27,13 @@ type GmpClient struct {
 	relayer *postgres.RelayerClient
 }
 
-func New(indexer *postgres.PostgresClient, relayer *postgres.PostgresClient) *GmpClient {
+func New(scalarPostgresClient *postgres.PostgresClient) *GmpClient {
 	return &GmpClient{
 		indexer: &postgres.IndexerClient{
-			PgClient: indexer,
+			PgClient: scalarPostgresClient,
 		},
 		relayer: &postgres.RelayerClient{
-			PgClient: relayer,
+			PgClient: scalarPostgresClient,
 		},
 	}
 }

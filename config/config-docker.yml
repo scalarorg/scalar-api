@@ -16,18 +16,10 @@ mongodb:
   db-batch-size-limit: 100
   logical-shard-count: 10
 
-indexerdb:
-  host: "postgresdb"
+scalardb:
+  host: "scalar-db"
   port: 5432
-  db-name: "xchains-indexer"
-  user: "postgres"
-  password: "postgres"
-  log-level: "debug"
-
-relayerdb:
-  host: "relayer"
-  port: 5432
-  db-name: "relayer"
+  db-name: "scalar"
   user: "postgres"
   password: "postgres"
   log-level: "debug"
