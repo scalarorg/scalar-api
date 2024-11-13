@@ -135,5 +135,5 @@ func (s *ScalarClient) ToggleDApp(ID string) error {
 
 func (s *ScalarClient) DeleteDApp(ID string) error {
 	dApps := s.scalarPostgresClient.Db
-	return dApps.Delete(&models.DApp{}, ID).Error
+	return dApps.Where("id = ?", ID).Delete(&models.DApp{}).Error
 }

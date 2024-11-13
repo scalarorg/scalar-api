@@ -1,7 +1,7 @@
 package models
 
 type DApp struct {
-	ID                   string `gorm:"primaryKey"`
+	ID                   string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	ChainName            string `gorm:"column:chain_name;not null"`
 	BTCAddressHex        string `gorm:"column:btc_address_hex"`
 	PublicKeyHex         string `gorm:"column:public_key_hex"`
