@@ -12,10 +12,10 @@ import (
 type Config struct {
 	Server    ServerConfig      `mapstructure:"server"`
 	MongoDb   MongoDbConfig     `mapstructure:"mongodb"`
-	IndexerDb PostgresDBConfig  `mapstructure:"indexerdb"`
-	RelayerDb PostgresDBConfig  `mapstructure:"relayerdb"`
+	ScalarDb  PostgresDBConfig  `mapstructure:"scalardb"`
 	Queue     queue.QueueConfig `mapstructure:"queue"`
 	Metrics   MetricsConfig     `mapstructure:"metrics"`
+	InitDApps InitDAppsConfig
 }
 
 func (cfg *Config) Validate() error {
@@ -27,11 +27,7 @@ func (cfg *Config) Validate() error {
 		return err
 	}
 
-	if err := cfg.IndexerDb.Validate(); err != nil {
-		return err
-	}
-
-	if err := cfg.RelayerDb.Validate(); err != nil {
+	if err := cfg.ScalarDb.Validate(); err != nil {
 		return err
 	}
 
@@ -72,6 +68,7 @@ func New(cfgFile string) (*Config, error) {
 	}
 
 	var cfg Config
+	cfg.InitDApps.ReadConfig()
 	if err = viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}

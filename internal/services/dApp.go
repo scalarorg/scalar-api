@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/scalarorg/xchains-api/internal/db/model"
+	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -23,7 +23,7 @@ type DAppServiceParams struct {
 
 func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
 
-	err := s.DbClient.SaveDApp(ctx, &model.DAppDocument{
+	err := s.ScalarClient.SaveDApp(&models.DApp{
 		ChainName:            params.ChainName,
 		BTCAddressHex:        params.BtcAddressHex,
 		PublicKeyHex:         params.PublicKeyHex,
@@ -41,8 +41,8 @@ func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *ty
 
 }
 
-func (s *Services) GetDApp(ctx context.Context) ([]*model.DAppDocument, *types.Error) {
-	dApps, err := s.DbClient.GetDApp(ctx)
+func (s *Services) GetDApp(ctx context.Context) ([]*models.DApp, *types.Error) {
+	dApps, err := s.ScalarClient.GetDApps()
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -51,7 +51,7 @@ func (s *Services) GetDApp(ctx context.Context) ([]*model.DAppDocument, *types.E
 
 func (s *Services) UpdateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
 
-	err := s.DbClient.UpdateDApp(ctx, &model.DAppDocument{
+	err := s.ScalarClient.UpdateDApp(&models.DApp{
 		ID:                   params.ID,
 		ChainName:            params.ChainName,
 		BTCAddressHex:        params.BtcAddressHex,
@@ -71,7 +71,7 @@ func (s *Services) UpdateDApp(ctx context.Context, params DAppServiceParams) *ty
 }
 
 func (s *Services) ToggleDApp(ctx context.Context, ID string) *types.Error {
-	err := s.DbClient.ToggleDApp(ctx, ID)
+	err := s.ScalarClient.ToggleDApp(ID)
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -79,7 +79,7 @@ func (s *Services) ToggleDApp(ctx context.Context, ID string) *types.Error {
 }
 
 func (s *Services) DeleteDApp(ctx context.Context, ID string) *types.Error {
-	err := s.DbClient.DeleteDApp(ctx, ID)
+	err := s.ScalarClient.DeleteDApp(ID)
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}

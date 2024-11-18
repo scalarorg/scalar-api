@@ -15,21 +15,15 @@ mongodb:
   max-pagination-limit: 10
   db-batch-size-limit: 100
   logical-shard-count: 2
-indexerdb:
-  host: "localhost"
-  port: 5442
-  db-name: "postgres"
-  user: "postgres"
-  password: "postgres"
-  log-level: "info"
 
-relayerdb:
+scalardb:
   host: "localhost"
-  port: 5442
-  db-name: "relayer"
+  port: 5462
+  db-name: "scalar"
   user: "postgres"
   password: "postgres"
   log-level: "debug"
+
 queue:
   queue_user: user # can be replaced by values in .env file
   queue_password: password
