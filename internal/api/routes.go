@@ -51,3 +51,11 @@ func registerGmpHandler(r *chi.Mux, handlers *handlers.Handler) {
 func registerVaultHandler(r *chi.Mux, handlers *handlers.Handler) {
 	r.Post("/v1/vault/searchVault", registerHandler(handlers.SearchVault))
 }
+
+func registerCustodialHandler(r *chi.Mux, handlers *handlers.Handler) {
+	r.Post("/v1/custodial", registerHandler(handlers.CreateCustodial))
+	r.Get("/v1/custodial", registerHandler(handlers.GetCustodial))
+	r.Get("/v1/custodial/{name}", registerHandler(handlers.GetCustodialByName))
+	r.Post("/v1/custodial/group", registerHandler(handlers.CreateCustodialGroup))
+	r.Get("/v1/custodial/group/{name}", registerHandler(handlers.GetCustodialGroupByName))
+}
