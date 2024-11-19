@@ -24,6 +24,9 @@ func (s *ScalarClient) MigrateTables() error {
 	if err := s.MigrateDApps(); err != nil {
 		return err
 	}
+	if err := s.MigrateCustodials(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -89,6 +92,10 @@ func (s *ScalarClient) InitDApps(cfg config.InitDAppsConfig) error {
 
 func (s *ScalarClient) MigrateDApps() error {
 	return s.scalarPostgresClient.Db.AutoMigrate(&models.DApp{})
+}
+
+func (s *ScalarClient) MigrateCustodials() error {
+	return s.scalarPostgresClient.Db.AutoMigrate(&models.Custodial{}, &models.CustodialGroup{})
 }
 
 func (s *ScalarClient) GetDApps() ([]*models.DApp, error) {
