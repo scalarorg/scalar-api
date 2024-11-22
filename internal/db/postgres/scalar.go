@@ -96,7 +96,7 @@ func (s *ScalarClient) InitDApps(cfg config.InitDAppsConfig) error {
 
 func (s *ScalarClient) GetDApps() ([]*models.DApp, error) {
 	var dApps []*models.DApp
-	if err := s.scalarPostgresClient.Db.Preload("CustodialGroup").Find(&dApps).Error; err != nil {
+	if err := s.scalarPostgresClient.Db.Preload("CustodialGroup").Preload("CustodialGroup.Custodials").Find(&dApps).Error; err != nil {
 		return nil, err
 	}
 	return dApps, nil
