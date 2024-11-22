@@ -41,8 +41,8 @@ func (h *Handler) CreateCustodial(request *http.Request) (*Result, *types.Error)
 	return NewResult(payload), nil
 }
 
-func (h *Handler) GetCustodial(request *http.Request) (*Result, *types.Error) {
-	custodials, err := h.services.GetCustodial(request.Context())
+func (h *Handler) GetCustodials(request *http.Request) (*Result, *types.Error) {
+	custodials, err := h.services.GetCustodials(request.Context())
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +77,29 @@ func (h *Handler) CreateCustodialGroup(request *http.Request) (*Result, *types.E
 	return NewResult(payload), nil
 }
 
+func (h *Handler) GetCustodialGroups(request *http.Request) (*Result, *types.Error) {
+	custodialGroups, err := h.services.GetCustodialGroups(request.Context())
+	if err != nil {
+		return nil, err
+	}
+	if custodialGroups == nil {
+		custodialGroups = []*models.CustodialGroup{}
+	}
+	return NewResult(custodialGroups), nil
+}
+
 func (h *Handler) GetCustodialGroupByName(request *http.Request) (*Result, *types.Error) {
 	custodialGroup, err := h.services.GetCustodialGroupByName(request.Context(), request.URL.Query().Get("name"))
 	if err != nil {
 		return nil, err
 	}
 	return NewResult(custodialGroup), nil
+}
+
+func (h *Handler) GetShortenCustodialGroups(request *http.Request) (*Result, *types.Error) {
+	shortenCustodialGroup, err := h.services.GetShortenCustodialGroups(request.Context())
+	if err != nil {
+		return nil, err
+	}
+	return NewResult(shortenCustodialGroup), nil
 }

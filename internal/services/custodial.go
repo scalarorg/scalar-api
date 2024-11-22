@@ -30,7 +30,7 @@ func (s *Services) CreateCustodial(ctx context.Context, params CreateCustodialSe
 	return nil
 }
 
-func (s *Services) GetCustodial(ctx context.Context) ([]*models.Custodial, *types.Error) {
+func (s *Services) GetCustodials(ctx context.Context) ([]*models.Custodial, *types.Error) {
 	custodials, err := s.ScalarClient.GetCustodials()
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
@@ -66,10 +66,26 @@ func (s *Services) CreateCustodialGroup(ctx context.Context, params CreateCustod
 	return nil
 }
 
+func (s *Services) GetCustodialGroups(ctx context.Context) ([]*models.CustodialGroup, *types.Error) {
+	custodialGroups, err := s.ScalarClient.GetCustodialGroups()
+	if err != nil {
+		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+	}
+	return custodialGroups, nil
+}
+
 func (s *Services) GetCustodialGroupByName(ctx context.Context, name string) (*models.CustodialGroup, *types.Error) {
 	custodialGroup, err := s.ScalarClient.GetCustodialGroupByName(name)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
 	return custodialGroup, nil
+}
+
+func (s *Services) GetShortenCustodialGroups(ctx context.Context) ([]*models.ShortenCustodialGroup, *types.Error) {
+	shortenCustodialGroups, err := s.ScalarClient.GetShortenCustodialGroups()
+	if err != nil {
+		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+	}
+	return shortenCustodialGroups, nil
 }

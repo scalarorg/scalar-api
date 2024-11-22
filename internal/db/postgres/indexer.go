@@ -14,11 +14,11 @@ type IndexerClient struct {
 }
 
 type Options struct {
-	Size       int
-	Offset     int
-	EventId    string
-	EventType  string
-	EventTypes []string
+	Size         int
+	Offset       int
+	EventId      string
+	EventType    string
+	EventTypes   []string
 	StakerPubkey string
 }
 type MapBlockEventAttributes map[string]string
@@ -63,10 +63,10 @@ func (c *IndexerClient) FindEventsByTypes(ctx context.Context, options *Options)
 			WHERE BlockEventType.Type IN ?`
 		query = query + fmt.Sprintf(" OFFSET %d LIMIT %d", options.Offset, options.Size)
 		rows, err := c.PgClient.Db.Raw(query, options.EventTypes).Rows()
-		defer rows.Close()
 		if err != nil {
 			return events, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 		}
+		defer rows.Close()
 
 		for rows.Next() {
 			blockEvent := models.BlockEvent{
@@ -120,10 +120,10 @@ func (c *IndexerClient) FindBlockEventsByAttribute(ctx context.Context, attribut
 			WHERE AttributeKey.key = ? AND Attribute.value in ?`
 	query = query + fmt.Sprintf(" OFFSET %d LIMIT %d", options.Offset, options.Size)
 	rows, err := c.PgClient.Db.Raw(query, attribute, stringValues).Rows()
-	defer rows.Close()
 	if err != nil {
 		return blockEvents, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
+	defer rows.Close()
 	var eventIds []uint
 	for rows.Next() {
 		var eventId uint
@@ -144,10 +144,10 @@ func (c *IndexerClient) FindBlockEventsByAttribute(ctx context.Context, attribut
 			WHERE BlockEvent.id IN ?`
 		query = query + fmt.Sprintf(" OFFSET %d LIMIT %d", options.Offset, options.Size)
 		rows, err := c.PgClient.Db.Raw(query, eventIds).Rows()
-		defer rows.Close()
 		if err != nil {
 			return blockEvents, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 		}
+		defer rows.Close()
 
 		for rows.Next() {
 			blockEvent := models.BlockEvent{

@@ -19,10 +19,10 @@ type DAppServiceParams struct {
 	RpcUrl               string
 	AccessToken          string
 	TokenContractAddress string
+	CustodialGroupID     uint
 }
 
 func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
-
 	err := s.ScalarClient.SaveDApp(&models.DApp{
 		ChainName:            params.ChainName,
 		BTCAddressHex:        params.BtcAddressHex,
@@ -33,6 +33,7 @@ func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *ty
 		RPCUrl:               params.RpcUrl,
 		AccessToken:          params.AccessToken,
 		TokenContractAddress: params.TokenContractAddress,
+		CustodialGroupID:     params.CustodialGroupID,
 	})
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
@@ -62,6 +63,7 @@ func (s *Services) UpdateDApp(ctx context.Context, params DAppServiceParams) *ty
 		RPCUrl:               params.RpcUrl,
 		AccessToken:          params.AccessToken,
 		TokenContractAddress: params.TokenContractAddress,
+		CustodialGroupID:     params.CustodialGroupID,
 	})
 
 	if err != nil {

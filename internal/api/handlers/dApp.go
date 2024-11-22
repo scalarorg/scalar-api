@@ -19,6 +19,7 @@ type CreateDAppRequestPayload struct {
 	RPCUrl               string `json:"rpc_url"`
 	AccessToken          string `json:"access_token"`
 	TokenContractAddress string `json:"token_contract_address"`
+	CustodialGroupID     uint   `json:"custodial_group_id"`
 }
 type UpdateDAppRequestPayload struct {
 	ID                   string `json:"id"`
@@ -31,6 +32,7 @@ type UpdateDAppRequestPayload struct {
 	RPCUrl               string `json:"rpc_url"`
 	AccessToken          string `json:"access_token"`
 	TokenContractAddress string `json:"token_contract_address"`
+	CustodialGroupID     uint   `json:"custodial_group_id"`
 }
 
 type IdRequestPayload struct {
@@ -96,6 +98,7 @@ func (h *Handler) CreateDApp(request *http.Request) (*Result, *types.Error) {
 		RpcUrl:               payload.RPCUrl,
 		AccessToken:          payload.AccessToken,
 		TokenContractAddress: payload.TokenContractAddress,
+		CustodialGroupID:     payload.CustodialGroupID,
 	}
 
 	err = h.services.CreateDApp(request.Context(), params)
@@ -140,6 +143,7 @@ func (h *Handler) UpdateDApp(request *http.Request) (*Result, *types.Error) {
 		RpcUrl:               payload.RPCUrl,
 		AccessToken:          payload.AccessToken,
 		TokenContractAddress: payload.TokenContractAddress,
+		CustodialGroupID:     payload.CustodialGroupID,
 	}
 
 	err = h.services.UpdateDApp(request.Context(), params)
