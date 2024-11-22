@@ -58,19 +58,20 @@ LEFT JOIN (
         ca."command_id" as ca_command_id,
         ROW_NUMBER() OVER (PARTITION BY ca."source_address", ca."contract_address", ca."payload_hash" ORDER BY ca."block_number") as rn
     FROM "call_contract_approveds" ca
-) ca ON c.c_source_address = ca."source_address" AND c.c_contract_address = ca."contract_address" AND c.c_payload_hash = ca."payload_hash" AND ca.rn = 1
-LEFT JOIN (
-    SELECT 
-        ct.id,
-        ct."contract_address" as ct_contract_address, 
-        ct.amount as ct_amount, 
-        ct.symbol as ct_symbol, 
-        ct.payload as ct_payload, 
-        ct."payload_hash" as ct_payload_hash, 
-        ct."source_address" as ct_source_address,
-        ROW_NUMBER() OVER (PARTITION BY ct.id ORDER BY ct."contract_address") as rn
-    FROM "call_contract_with_tokens" ct
-) ct ON rd.id = ct.id AND ct.rn = 1`
+) ca ON c.c_source_address = ca."source_address" AND c.c_contract_address = ca."contract_address" AND c.c_payload_hash = ca."payload_hash" AND ca.rn = 1`
+
+// LEFT JOIN (
+//     SELECT
+//         ct.id,
+//         ct."contract_address" as ct_contract_address,
+//         ct.amount as ct_amount,
+//         ct.symbol as ct_symbol,
+//         ct.payload as ct_payload,
+//         ct."payload_hash" as ct_payload_hash,
+//         ct."source_address" as ct_source_address,
+//         ROW_NUMBER() OVER (PARTITION BY ct.id ORDER BY ct."contract_address") as rn
+//     FROM "call_contract_with_tokens" ct
+// ) ct ON rd.id = ct.id AND ct.rn = 1`
 
 func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
 	var relayDatas []RelayData
@@ -104,7 +105,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 			ContractCall: ContractCall{
 				ContractCallApproved: ContractCallApproved{},
 			},
-			ContractCallWithToken: ContractCallWithToken{},
+			//ContractCallWithToken: ContractCallWithToken{},
 		}
 		// ScanRows scan a row into user
 		err := rows.Scan(&relayData.ID,
@@ -136,18 +137,18 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 			&relayData.ContractCall.ContractCallApproved.SourceEventIndex,
 			&relayData.ContractCall.ContractCallApproved.PayloadHash,
 			&relayData.ContractCall.ContractCallApproved.CommandId,
-			&relayData.ContractCallWithToken.ContractAddress,
-			&relayData.ContractCallWithToken.Amount,
-			&relayData.ContractCallWithToken.Symbol,
-			&relayData.ContractCallWithToken.Payload,
-			&relayData.ContractCallWithToken.PayloadHash,
-			&relayData.ContractCallWithToken.SourceAddress,
+			// &relayData.ContractCallWithToken.ContractAddress,
+			// &relayData.ContractCallWithToken.Amount,
+			// &relayData.ContractCallWithToken.Symbol,
+			// &relayData.ContractCallWithToken.Payload,
+			// &relayData.ContractCallWithToken.PayloadHash,
+			// &relayData.ContractCallWithToken.SourceAddress,
 		)
 		if err != nil {
 			fmt.Printf("Error while scanning rows %v", err)
 		}
 		relayData.ContractCall.ID = relayData.ID
-		relayData.ContractCallWithToken.ID = relayData.ID
+		//relayData.ContractCallWithToken.ID = relayData.ID
 		relayDatas = append(relayDatas, relayData)
 		// do something
 	}
@@ -255,7 +256,7 @@ func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Op
 			ContractCall: ContractCall{
 				ContractCallApproved: ContractCallApproved{},
 			},
-			ContractCallWithToken: ContractCallWithToken{},
+			//ContractCallWithToken: ContractCallWithToken{},
 		}
 		// ScanRows scan a row into user
 		err := rows.Scan(&relayData.ID,
@@ -282,7 +283,7 @@ func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Op
 			fmt.Printf("Error while scanning rows %v", err)
 		}
 		relayData.ContractCall.ID = relayData.ID
-		relayData.ContractCallWithToken.ID = relayData.ID
+		//relayData.ContractCallWithToken.ID = relayData.ID
 		relayDatas = append(relayDatas, relayData)
 		// do something
 	}

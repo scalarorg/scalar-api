@@ -38,10 +38,10 @@ type RelayData struct {
 	To                      sql.NullString
 	CreatedAt               sql.NullTime
 	UpdatedAt               sql.NullTime
-	ContractCallID          sql.NullInt32         `gorm:"foreignKey:ID;references:ID"`
-	ContractCall            ContractCall          `gorm:"foreignKey:ID;references:ID"`
-	ContractCallWithTokenID sql.NullInt32         `gorm:"foreignKey:ID;references:ID"`
-	ContractCallWithToken   ContractCallWithToken `gorm:"foreignKey:ID;references:ID"`
+	ContractCallID          sql.NullInt32 `gorm:"foreignKey:ID;references:ID"`
+	ContractCall            ContractCall  `gorm:"foreignKey:ID;references:ID"`
+	ContractCallWithTokenID sql.NullInt32 `gorm:"foreignKey:ID;references:ID"`
+	//ContractCallWithToken   ContractCallWithToken `gorm:"foreignKey:ID;references:ID"`
 }
 type ContractCall struct {
 	ID                   string `gorm:"primaryKey"`

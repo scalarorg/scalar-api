@@ -191,16 +191,16 @@ func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
 		call.ReturnValues.DestinationChain = relayData.To.String
 		call.ReturnValues.ContractAddress = relayData.ContractCall.ContractAddress.String
 	}
-	if relayData.ContractCallWithToken.ContractAddress.Valid {
-		call.ContractAddress = relayData.ContractCallWithToken.ContractAddress.String
-		call.ReturnValues.Sender = relayData.ContractCallWithToken.SourceAddress.String
-		call.ReturnValues.PayloadHash = relayData.ContractCallWithToken.PayloadHash.String
-		call.ReturnValues.Payload = relayData.ContractCallWithToken.Payload.String
-		call.ReturnValues.SourceAddress = relayData.ContractCallWithToken.SourceAddress.String
-		call.ReturnValues.DestinationContractAddress = relayData.ContractCallWithToken.ContractAddress.String
-		call.ReturnValues.DestinationChain = relayData.To.String
-		call.ReturnValues.ContractAddress = relayData.ContractCallWithToken.ContractAddress.String
-	}
+	// if relayData.ContractCallWithToken.ContractAddress.Valid {
+	// 	call.ContractAddress = relayData.ContractCallWithToken.ContractAddress.String
+	// 	call.ReturnValues.Sender = relayData.ContractCallWithToken.SourceAddress.String
+	// 	call.ReturnValues.PayloadHash = relayData.ContractCallWithToken.PayloadHash.String
+	// 	call.ReturnValues.Payload = relayData.ContractCallWithToken.Payload.String
+	// 	call.ReturnValues.SourceAddress = relayData.ContractCallWithToken.SourceAddress.String
+	// 	call.ReturnValues.DestinationContractAddress = relayData.ContractCallWithToken.ContractAddress.String
+	// 	call.ReturnValues.DestinationChain = relayData.To.String
+	// 	call.ReturnValues.ContractAddress = relayData.ContractCallWithToken.ContractAddress.String
+	// }
 	gmp.Call = call
 	// fmt.Printf("ContractCall %v\n", relayData.ContractCall)
 	// fmt.Printf("ContractCallWithToken %v\n", relayData.ContractCallWithToken)
