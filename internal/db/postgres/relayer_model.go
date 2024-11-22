@@ -60,7 +60,7 @@ type ContractCall struct {
 	CommandExecuted      CommandExecuted      `gorm:"foreignKey:ID;references:ID"`
 	StakerPublicKey      sql.NullString
 	SenderAddress        sql.NullString
-	RelayDataID          uint
+	RelayDataID          string
 	TxHash               sql.NullString
 	TxHex                []byte
 }
@@ -127,7 +127,6 @@ type ContractCallWithTokenApproved struct {
 	PayloadHash      sql.NullString
 	CommandId        sql.NullString
 }
-
 
 func (RelayData) TableName() string {
 	return "relay_data"
