@@ -100,7 +100,7 @@ func (s *ScalarClient) MigrateCustodials() error {
 
 func (s *ScalarClient) GetDApps() ([]*models.DApp, error) {
 	var dApps []*models.DApp
-	if err := s.scalarPostgresClient.Db.Find(&dApps).Error; err != nil {
+	if err := s.scalarPostgresClient.Db.Preload("CustodialGroup").Find(&dApps).Error; err != nil {
 		return nil, err
 	}
 	return dApps, nil
@@ -112,9 +112,14 @@ func (s *ScalarClient) SaveDApp(dApp *models.DApp) error {
 }
 
 func (s *ScalarClient) UpdateDApp(dApp *models.DApp) error {
-	// Using GORM's db.Model().Where().Updates() pattern
-	result := s.scalarPostgresClient.Db.Model(&models.DApp{}).
-		Where("id = ?", dApp.ID).
+	// First find the existing DApp
+	existingDApp := &models.DApp{}
+	if err := s.scalarPostgresClient.Db.First(existingDApp, dApp.ID).Error; err != nil {
+		return err
+	}
+
+	// Update the DApp with all fields including associations
+	result := s.scalarPostgresClient.Db.Model(existingDApp).
 		Updates(map[string]interface{}{
 			"chain_name":             dApp.ChainName,
 			"btc_address_hex":        dApp.BTCAddressHex,
@@ -125,9 +130,19 @@ func (s *ScalarClient) UpdateDApp(dApp *models.DApp) error {
 			"rpc_url":                dApp.RPCUrl,
 			"access_token":           dApp.AccessToken,
 			"token_contract_address": dApp.TokenContractAddress,
+			"custodial_group_id":     dApp.CustodialGroupID,
 		})
 
-	return result.Error
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// Update the CustodialGroup association
+	if err := s.scalarPostgresClient.Db.Model(existingDApp).Association("CustodialGroup").Replace(dApp.CustodialGroup); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *ScalarClient) ToggleDApp(ID string) error {
