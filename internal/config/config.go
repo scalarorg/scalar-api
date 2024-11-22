@@ -5,16 +5,14 @@ import (
 	"os"
 	"strings"
 
-	queue "github.com/scalarorg/staking-queue-client/config"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Server    ServerConfig      `mapstructure:"server"`
-	MongoDb   MongoDbConfig     `mapstructure:"mongodb"`
-	ScalarDb  PostgresDBConfig  `mapstructure:"scalardb"`
-	Queue     queue.QueueConfig `mapstructure:"queue"`
-	Metrics   MetricsConfig     `mapstructure:"metrics"`
+	Server ServerConfig `mapstructure:"server"`
+	// TODO: Refactor db config
+	ScalarDb  PostgresDBConfig `mapstructure:"db"`
+	Metrics   MetricsConfig    `mapstructure:"metrics"`
 	InitDApps InitDAppsConfig
 }
 
@@ -23,19 +21,11 @@ func (cfg *Config) Validate() error {
 		return err
 	}
 
-	if err := cfg.MongoDb.Validate(); err != nil {
-		return err
-	}
-
 	if err := cfg.ScalarDb.Validate(); err != nil {
 		return err
 	}
 
 	if err := cfg.Metrics.Validate(); err != nil {
-		return err
-	}
-
-	if err := cfg.Queue.Validate(); err != nil {
 		return err
 	}
 

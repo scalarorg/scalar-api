@@ -3,10 +3,8 @@ package model
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/scalarorg/xchains-api/internal/config"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -49,36 +47,9 @@ var collections = map[string][]index{
 	GMPCollection:              {{Indexes: map[string]int{}, Unique: true}},
 }
 
-func Setup(ctx context.Context, cfg *config.Config) error {
-	fmt.Printf("MongoDB Address %s", cfg.MongoDb.Address)
-	fmt.Printf("ScalarDB Address %s:%d", cfg.ScalarDb.Host, cfg.ScalarDb.Port)
-	clientOps := options.Client().ApplyURI(cfg.MongoDb.Address)
-	client, err := mongo.Connect(ctx, clientOps)
-	if err != nil {
-		return err
-	}
-
-	// Create a context with timeout.
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	// Access a database and create collections.
-	mongoDb := client.Database(cfg.MongoDb.DbName)
-
-	// Create collections.
-	for collection := range collections {
-		createCollection(ctx, mongoDb, collection)
-	}
-
-	for name, idxs := range collections {
-		for _, idx := range idxs {
-			createIndex(ctx, mongoDb, name, idx)
-		}
-	}
-
-	log.Info().Msg("Collections and Indexes created successfully.")
-	return nil
-}
+// func Setup(ctx context.Context, cfg *config.Config) error {
+// 	return nil
+// }
 
 func createCollection(ctx context.Context, database *mongo.Database, collectionName string) {
 	// Check if the collection already exists.

@@ -2,13 +2,10 @@ package healthcheck
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/scalarorg/xchains-api/internal/observability/metrics"
-	"github.com/scalarorg/xchains-api/internal/queue"
 )
 
 var logger zerolog.Logger = log.Logger
@@ -17,7 +14,7 @@ func SetLogger(customLogger zerolog.Logger) {
 	logger = customLogger
 }
 
-func StartHealthCheckCron(ctx context.Context, queues *queue.Queues, cronTime int) error {
+func StartHealthCheckCron(ctx context.Context, cronTime int) error {
 	c := cron.New()
 	logger.Info().Msg("Initiated Health Check Cron")
 
@@ -25,15 +22,15 @@ func StartHealthCheckCron(ctx context.Context, queues *queue.Queues, cronTime in
 		cronTime = 60
 	}
 
-	cronSpec := fmt.Sprintf("@every %ds", cronTime)
+	// cronSpec := fmt.Sprintf("@every %ds", cronTime)
 
-	_, err := c.AddFunc(cronSpec, func() {
-		queueHealthCheck(queues)
-	})
+	// _, err := c.AddFunc(cronSpec, func() {
+	// 	queueHealthCheck(queues)
+	// })
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
 	c.Start()
 
@@ -44,17 +41,4 @@ func StartHealthCheckCron(ctx context.Context, queues *queue.Queues, cronTime in
 	}()
 
 	return nil
-}
-
-func queueHealthCheck(queues *queue.Queues) {
-	if err := queues.IsConnectionHealthy(); err != nil {
-		logger.Error().Err(err).Msg("One or more queue connections are not healthy.")
-		// Record service unavailable in metrics
-		metrics.RecordServiceCrash("queue")
-		terminateService()
-	}
-}
-
-func terminateService() {
-	logger.Fatal().Msg("Terminating service due to health check failure.")
 }

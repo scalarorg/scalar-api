@@ -13,10 +13,6 @@ import (
 // @Success 200 {string} PublicResponse[string] "Server is up and running"
 // @Router /healthcheck [get]
 func (h *Handler) HealthCheck(request *http.Request) (*Result, *types.Error) {
-	err := h.services.DoHealthCheck(request.Context())
-	if err != nil {
-		return nil, types.NewInternalServiceError(err)
-	}
-
+	// TODO: Add health check for db connection
 	return NewResult("Server is up and running"), nil
 }
