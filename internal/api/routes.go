@@ -19,6 +19,7 @@ func (a *Server) SetupRoutes(r *chi.Mux) {
 	registerDAppHandler(r, handlers)
 	registerGmpHandler(r, handlers)
 	registerVaultHandler(r, handlers)
+	registerCustodialHandler(r, handlers)
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 }
