@@ -21,13 +21,17 @@ func NewScalarClient(scalarPostgresClient *PostgresClient) *ScalarClient {
 }
 
 func (s *ScalarClient) MigrateTables() error {
-	if err := s.MigrateDApps(); err != nil {
-		return err
-	}
-	if err := s.MigrateCustodials(); err != nil {
-		return err
-	}
-	return nil
+	return s.scalarPostgresClient.Db.AutoMigrate(
+		&models.Custodial{},
+		&models.DApp{},
+		&models.CustodialGroup{},
+		&RelayData{},
+		&ContractCall{},
+		&ContractCallWithToken{},
+		&ContractCallApproved{},
+		&ContractCallWithTokenApproved{},
+		&CommandExecuted{},
+	)
 }
 
 func (s *ScalarClient) InitDApps(cfg config.InitDAppsConfig) error {
@@ -88,14 +92,6 @@ func (s *ScalarClient) InitDApps(cfg config.InitDAppsConfig) error {
 	}
 
 	return nil
-}
-
-func (s *ScalarClient) MigrateDApps() error {
-	return s.scalarPostgresClient.Db.AutoMigrate(&models.DApp{})
-}
-
-func (s *ScalarClient) MigrateCustodials() error {
-	return s.scalarPostgresClient.Db.AutoMigrate(&models.Custodial{}, &models.CustodialGroup{})
 }
 
 func (s *ScalarClient) GetDApps() ([]*models.DApp, error) {

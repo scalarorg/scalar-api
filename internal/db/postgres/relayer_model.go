@@ -57,12 +57,12 @@ type ContractCall struct {
 	DestContractAddress  sql.NullString //Same as ContractAddress
 	Amount               sql.NullString
 	ContractCallApproved ContractCallApproved `gorm:"foreignKey:ID;references:ID"`
-	CommandExecuted      CommandExecuted
-	StakerPublicKey      sql.NullString `gorm:"column:stakerPublicKey"`
-	SenderAddress        sql.NullString `gorm:"column:senderAddress"`
-	RelayDataID          uint           `gorm:"foreignKey:ID;references:ID"`
-	TxHash               sql.NullString `gorm:"column:txHash"`
-	TxHex                []byte         `gorm:"column:txHex"`
+	CommandExecuted      CommandExecuted      `gorm:"foreignKey:ID;references:ID"`
+	StakerPublicKey      sql.NullString       `gorm:"column:stakerPublicKey"`
+	SenderAddress        sql.NullString       `gorm:"column:senderAddress"`
+	RelayDataID          uint                 `gorm:"foreignKey:ID;references:ID"`
+	TxHash               sql.NullString       `gorm:"column:txHash"`
+	TxHex                []byte               `gorm:"column:txHex"`
 }
 
 type ContractCallWithToken struct {
@@ -146,4 +146,8 @@ func (ContractCallApproved) TableName() string {
 
 func (ContractCallWithTokenApproved) TableName() string {
 	return "ContractCallWithTokenApproved"
+}
+
+func (CommandExecuted) TableName() string {
+	return "CommandExecuted"
 }
