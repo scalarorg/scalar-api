@@ -16,60 +16,60 @@ type RelayerClient struct {
 
 const QUERY_RELAYDATA = `
 SELECT 
-    rd.id, rd.status, rd.from, rd.to, rd."packetSequence", rd."executeHash", rd."createdAt", rd."updatedAt",
-    c.c_blockNumber, c.c_txHash,
-    c.c_logIndex, c.c_contractAddress, c.c_payload, c.c_payloadHash, c.c_sourceAddress, c.c_stakerPublicKey, c_senderAddress, c.c_amount,
-    ca.ca_sourceChain, ca.ca_destinationChain, ca.ca_txHash, ca.ca_blockNumber, ca.ca_logIndex, ca.ca_sourceAddress,
-    ca.ca_contractAddress, ca.ca_sourceTxHash, ca.ca_sourceEventIndex, ca.ca_payloadHash, ca.ca_commandId,
-    ct.ct_contractAddress, ct.ct_amount, ct.ct_symbol, ct.ct_payload, ct.ct_payloadHash, ct.ct_sourceAddress
-FROM "RelayData" rd
+    rd.id, rd.status, rd.from, rd.to, rd."packet_sequence", rd."execute_hash", rd."created_at", rd."updated_at",
+    c.c_block_number, c.c_tx_hash,
+    c.c_log_index, c.c_contract_address, c.c_payload, c.c_payload_hash, c.c_source_address, c.c_staker_public_key, c_sender_address, c.c_amount,
+    ca.ca_source_chain, ca.ca_destination_chain, ca.ca_tx_hash, ca.ca_block_number, ca.ca_log_index, ca.ca_source_address,
+    ca.ca_contract_address, ca.ca_source_tx_hash, ca.ca_source_event_index, ca.ca_payload_hash, ca.ca_command_id,
+    ct.ct_contract_address, ct.ct_amount, ct.ct_symbol, ct.ct_payload, ct.ct_payload_hash, ct.ct_source_address
+FROM "relay_datas" rd
 LEFT JOIN (
     SELECT 
         c.id,
-        c."blockNumber" as c_blockNumber, 
-		c."txHash" as c_txHash,
-		c."txHex" as c_txHex,
-        c."logIndex" as c_logIndex, 
-        c."contractAddress" as c_contractAddress, 
+        c."block_number" as c_block_number, 
+		c."tx_hash" as c_tx_hash,
+		c."tx_hex" as c_tx_hex,
+        c."log_index" as c_log_index, 
+        c."contract_address" as c_contract_address, 
         c.payload as c_payload, 
-        c."payloadHash" as c_payloadHash, 
-        c."sourceAddress" as c_sourceAddress, 
-        c."stakerPublicKey" as c_stakerPublicKey,
-		c."senderAddress" as c_senderAddress,
+        c."payload_hash" as c_payload_hash, 
+        c."source_address" as c_source_address, 
+        c."staker_public_key" as c_staker_public_key,
+		c."sender_address" as c_sender_address,
 		c."amount" as c_amount,
-        ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY c."blockNumber") as rn
-    FROM "CallContract" c
+        ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY c."block_number") as rn
+    FROM "call_contracts" c
 ) c ON rd.id = c.id AND c.rn = 1
 LEFT JOIN (
     SELECT 
-        ca."sourceAddress",
-        ca."contractAddress",
-        ca."payloadHash",
-        ca."sourceChain" as ca_sourceChain, 
-        ca."destinationChain" as ca_destinationChain, 
-        ca."txHash" as ca_txHash, 
-        ca."blockNumber" as ca_blockNumber, 
-        ca."logIndex" as ca_logIndex, 
-        ca."sourceAddress" as ca_sourceAddress,
-        ca."contractAddress" as ca_contractAddress, 
-        ca."sourceTxHash" as ca_sourceTxHash, 
-        ca."sourceEventIndex" as ca_sourceEventIndex, 
-        ca."payloadHash" as ca_payloadHash, 
-        ca."commandId" as ca_commandId,
-        ROW_NUMBER() OVER (PARTITION BY ca."sourceAddress", ca."contractAddress", ca."payloadHash" ORDER BY ca."blockNumber") as rn
-    FROM "CallContractApproved" ca
-) ca ON c.c_sourceAddress = ca."sourceAddress" AND c.c_contractAddress = ca."contractAddress" AND c.c_payloadHash = ca."payloadHash" AND ca.rn = 1
+        ca."source_address",
+        ca."contract_address",
+        ca."payload_hash",
+        ca."source_chain" as ca_source_chain, 
+        ca."destination_chain" as ca_destination_chain, 
+        ca."tx_hash" as ca_tx_hash, 
+        ca."block_number" as ca_block_number, 
+        ca."log_index" as ca_log_index, 
+        ca."source_address" as ca_source_address,
+        ca."contract_address" as ca_contract_address, 
+        ca."source_tx_hash" as ca_source_tx_hash, 
+        ca."source_event_index" as ca_source_event_index, 
+        ca."payload_hash" as ca_payload_hash, 
+        ca."command_id" as ca_command_id,
+        ROW_NUMBER() OVER (PARTITION BY ca."source_address", ca."contract_address", ca."payload_hash" ORDER BY ca."block_number") as rn
+    FROM "call_contract_approveds" ca
+) ca ON c.c_source_address = ca."source_address" AND c.c_contract_address = ca."contract_address" AND c.c_payload_hash = ca."payload_hash" AND ca.rn = 1
 LEFT JOIN (
     SELECT 
         ct.id,
-        ct."contractAddress" as ct_contractAddress, 
+        ct."contract_address" as ct_contract_address, 
         ct.amount as ct_amount, 
         ct.symbol as ct_symbol, 
         ct.payload as ct_payload, 
-        ct."payloadHash" as ct_payloadHash, 
-        ct."sourceAddress" as ct_sourceAddress,
-        ROW_NUMBER() OVER (PARTITION BY ct.id ORDER BY ct."contractAddress") as rn
-    FROM "CallContractWithToken" ct
+        ct."payload_hash" as ct_payload_hash, 
+        ct."source_address" as ct_source_address,
+        ROW_NUMBER() OVER (PARTITION BY ct.id ORDER BY ct."contract_address") as rn
+    FROM "call_contract_with_tokens" ct
 ) ct ON rd.id = ct.id AND ct.rn = 1`
 
 func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
@@ -86,7 +86,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 		query = query + " WHERE rd.id = ?"
 		// query = query + " WHERE LEFT(rd.id, 66) = ?" // because the id was formated with the tx hash + event index like: 0x123...-0
 	}
-	query = query + fmt.Sprintf(` ORDER by rd."createdAt" desc OFFSET %d LIMIT %d`, options.Offset, options.Size)
+	query = query + fmt.Sprintf(` ORDER by rd."created_at" desc OFFSET %d LIMIT %d`, options.Offset, options.Size)
 	var rows *sql.Rows
 	var err error
 	if options.EventId != "" {
@@ -198,31 +198,31 @@ func (c *RelayerClient) GetContractCallParams(ctx context.Context, messageIds []
 
 const QUERY_VAULT_RELAYDATA = `
 SELECT 
-    rd.id, rd.status, rd.from, rd.to, rd."packetSequence", rd."executeHash", rd."createdAt", rd."updatedAt",
-    c.c_blockNumber, c.c_txHash, c.c_txHex,
-    c.c_logIndex, c.c_contractAddress, c.c_payload, c.c_payloadHash, c.c_sourceAddress, c.c_stakerPublicKey, c.c_amount,
+    rd.id, rd.status, rd.from, rd.to, rd."packet_sequence", rd."execute_hash", rd."created_at", rd."updated_at",
+    c.c_block_number, c.c_tx_hash, c.c_tx_hex,
+    c.c_log_index, c.c_contract_address, c.c_payload, c.c_payload_hash, c.c_source_address, c.c_staker_public_key, c.c_amount,
     ce.ce_amount
-FROM "RelayData" rd
+FROM "relay_datas" rd
 JOIN (
     SELECT 
         c.id,
-        c."blockNumber" as c_blockNumber, 
-                c."txHash" as c_txHash,
-                c."txHex" as c_txHex,
-        c."logIndex" as c_logIndex, 
-        c."contractAddress" as c_contractAddress, 
+        c."block_number" as c_block_number, 
+        c."tx_hash" as c_tx_hash,
+        c."tx_hex" as c_tx_hex,
+        c."log_index" as c_log_index, 
+        c."contract_address" as c_contract_address, 
         c.payload as c_payload, 
-        c."payloadHash" as c_payloadHash, 
-        c."sourceAddress" as c_sourceAddress, 
-        c."stakerPublicKey" as c_stakerPublicKey,
-                c."amount" as c_amount
-    FROM "CallContract" c
+        c."payload_hash" as c_payload_hash, 
+        c."source_address" as c_source_address, 
+        c."staker_public_key" as c_staker_public_key,
+        c."amount" as c_amount
+    FROM "call_contracts" c
 ) c ON rd.id = c.id 
 LEFT JOIN (
      SELECT ce."amount" as ce_amount,
-            ce."referenceTxHash" as ce_refTxHash
-     FROM "CommandExecuted" ce
-) ce ON ce_refTxHash = c_txHash WHERE rd."status" = 2`
+            ce."reference_tx_hash" as ce_ref_tx_hash
+     FROM "command_executeds" ce
+) ce ON ce_ref_tx_hash = c_tx_hash WHERE rd."status" = 2`
 
 func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
 	var relayDatas []RelayData
@@ -234,10 +234,10 @@ func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Op
 	}
 	query := QUERY_VAULT_RELAYDATA
 	if options.StakerPubkey != "" {
-		query = query + " AND c.c_stakerPublicKey = ?"
+		query = query + " AND c.c_staker_public_key = ?"
 	}
 
-	query = query + fmt.Sprintf(` ORDER by rd."createdAt" desc OFFSET %d LIMIT %d`, options.Offset, options.Size)
+	query = query + fmt.Sprintf(` ORDER by rd."created_at" desc OFFSET %d LIMIT %d`, options.Offset, options.Size)
 
 	var rows *sql.Rows
 	var err error

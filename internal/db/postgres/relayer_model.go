@@ -47,9 +47,9 @@ type ContractCall struct {
 	ID                   string `gorm:"primaryKey"`
 	CreatedAt            sql.NullTime
 	UpdatedAt            sql.NullTime
-	BlockNumber          sql.NullInt32  `gorm:"column:blockNumber"`
-	LogIndex             sql.NullInt32  `gorm:"column:logIndex"`
-	ContractAddress      sql.NullString `gorm:"column:contractAddress"`
+	BlockNumber          sql.NullInt32 `gorm:"column:block_number"`
+	LogIndex             sql.NullInt32
+	ContractAddress      sql.NullString
 	Payload              sql.NullString
 	PayloadHash          sql.NullString
 	SourceAddress        sql.NullString
@@ -58,19 +58,19 @@ type ContractCall struct {
 	Amount               sql.NullString
 	ContractCallApproved ContractCallApproved `gorm:"foreignKey:ID;references:ID"`
 	CommandExecuted      CommandExecuted      `gorm:"foreignKey:ID;references:ID"`
-	StakerPublicKey      sql.NullString       `gorm:"column:stakerPublicKey"`
-	SenderAddress        sql.NullString       `gorm:"column:senderAddress"`
-	RelayDataID          uint                 `gorm:"foreignKey:ID;references:ID"`
-	TxHash               sql.NullString       `gorm:"column:txHash"`
-	TxHex                []byte               `gorm:"column:txHex"`
+	StakerPublicKey      sql.NullString
+	SenderAddress        sql.NullString
+	RelayDataID          uint
+	TxHash               sql.NullString
+	TxHex                []byte
 }
 
 type ContractCallWithToken struct {
 	ID                  string `gorm:"primaryKey"`
 	CreatedAt           sql.NullTime
 	UpdatedAt           sql.NullTime
-	BlockNumber         sql.NullInt32  `gorm:"column:blockNumber"`
-	ContractAddress     sql.NullString `gorm:"column:contractAddress"`
+	BlockNumber         sql.NullInt32
+	ContractAddress     sql.NullString
 	Payload             sql.NullString
 	PayloadHash         sql.NullString
 	SourceAddress       sql.NullString
@@ -85,69 +85,45 @@ type ContractCallApproved struct {
 	ID               string `gorm:"primaryKey"`
 	CreatedAt        sql.NullTime
 	UpdatedAt        sql.NullTime
-	SourceChain      sql.NullString `gorm:"column:sourceChain"`
-	DestinationChain sql.NullString `gorm:"column:destinationChain"`
-	TxHash           sql.NullString `gorm:"column:txHash"`
-	BlockNumber      sql.NullInt32  `gorm:"column:blockNumber"`
-	LogIndex         sql.NullInt32  `gorm:"column:logIndex"`
-	SourceAddress    sql.NullString `gorm:"column:sourceAddress"`
-	ContractAddress  sql.NullString `gorm:"column:contractAddress"`
-	SourceTxHash     sql.NullString `gorm:"column:sourceTxHash"`
-	SourceEventIndex sql.NullInt64  `gorm:"column:sourceEventIndex"`
-	PayloadHash      sql.NullString `gorm:"column:payloadHash"`
-	CommandId        sql.NullString `gorm:"column:commandID"`
+	SourceChain      sql.NullString
+	DestinationChain sql.NullString
+	TxHash           sql.NullString
+	BlockNumber      sql.NullInt32
+	LogIndex         sql.NullInt32
+	SourceAddress    sql.NullString
+	ContractAddress  sql.NullString
+	SourceTxHash     sql.NullString
+	SourceEventIndex sql.NullInt64
+	PayloadHash      sql.NullString
+	CommandId        sql.NullString
 }
 
 type CommandExecuted struct {
-	ID               string         `gorm:"primaryKey"`
-	SourceChain      sql.NullString `gorm:"column:sourceChain"`
-	DestinationChain sql.NullString `gorm:"column:destinationChain"`
-	TxHash           sql.NullString `gorm:"column:txHash"`
-	BlockNumber      sql.NullInt32  `gorm:"column:blockNumber"`
-	LogIndex         sql.NullInt32  `gorm:"column:logIndex"`
-	CommandId        sql.NullString `gorm:"column:commandID"`
-	Status           sql.NullInt32  `gorm:"column:status"`
-	ReferenceTxHash  sql.NullString `gorm:"column:referenceTxHash"`
-	Amount           sql.NullString `gorm:"column:amount"`
+	ID               string `gorm:"primaryKey"`
+	SourceChain      sql.NullString
+	DestinationChain sql.NullString
+	TxHash           sql.NullString
+	BlockNumber      sql.NullInt32
+	LogIndex         sql.NullInt32
+	CommandId        sql.NullString
+	Status           sql.NullInt32
+	ReferenceTxHash  sql.NullString
+	Amount           sql.NullString
 }
 
 type ContractCallWithTokenApproved struct {
 	ID               string `gorm:"primaryKey"`
 	CreatedAt        sql.NullTime
 	UpdatedAt        sql.NullTime
-	SourceChain      sql.NullString `gorm:"column:sourceChain"`
-	DestinationChain sql.NullString `gorm:"column:destinationChain"`
-	TxHash           sql.NullString `gorm:"column:txHash"`
-	BlockNumber      sql.NullInt32  `gorm:"column:blockNumber"`
-	LogIndex         sql.NullInt32  `gorm:"column:logIndex"`
-	SourceAddress    sql.NullString `gorm:"column:sourceAddress"`
-	ContractAddress  sql.NullString `gorm:"column:contractAddress"`
-	SourceTxHash     sql.NullString `gorm:"column:sourceTxHash"`
-	SourceEventIndex sql.NullInt64  `gorm:"column:sourceEventIndex"`
-	PayloadHash      sql.NullString `gorm:"column:payloadHash"`
-	CommandId        sql.NullString `gorm:"column:commandID"`
-}
-
-func (RelayData) TableName() string {
-	return "RelayData"
-}
-
-func (ContractCall) TableName() string {
-	return "CallContract"
-}
-
-func (ContractCallWithToken) TableName() string {
-	return "CallContractWithToken"
-}
-
-func (ContractCallApproved) TableName() string {
-	return "ContractCallApproved"
-}
-
-func (ContractCallWithTokenApproved) TableName() string {
-	return "ContractCallWithTokenApproved"
-}
-
-func (CommandExecuted) TableName() string {
-	return "CommandExecuted"
+	SourceChain      sql.NullString
+	DestinationChain sql.NullString
+	TxHash           sql.NullString
+	BlockNumber      sql.NullInt32
+	LogIndex         sql.NullInt32
+	SourceAddress    sql.NullString
+	ContractAddress  sql.NullString
+	SourceTxHash     sql.NullString
+	SourceEventIndex sql.NullInt64
+	PayloadHash      sql.NullString
+	CommandId        sql.NullString
 }

@@ -33,11 +33,13 @@ func (c *VaultClient) Search(ctx context.Context, payload *types.VaultPayload) (
 		return nil, err
 	}
 
-	return c.getVaultsByRelayData(ctx, relayerData)
+	return c.getVaultsByRelayData(relayerData)
 }
 
-func (c *VaultClient) getVaultsByRelayData(ctx context.Context, relayDatas []postgres.RelayData) ([]*VaultDocument, error) {
+func (c *VaultClient) getVaultsByRelayData(relayDatas []postgres.RelayData) ([]*VaultDocument, error) {
 	vaults := make([]*VaultDocument, 0, len(relayDatas))
+
+	// TODO: why loop here? query batching?
 	for _, relayData := range relayDatas {
 		vault, err := c.getVaultByRelayData(&relayData)
 		if err != nil {
