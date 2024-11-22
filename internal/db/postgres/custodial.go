@@ -60,7 +60,7 @@ func (s *ScalarClient) GetCustodialGroupByID(id uint) (*models.CustodialGroup, e
 
 func (s *ScalarClient) GetShortenCustodialGroups() ([]*models.ShortenCustodialGroup, error) {
 	var shortenCustodialGroups []*models.ShortenCustodialGroup
-	if err := s.scalarPostgresClient.Db.Model(&models.CustodialGroup{}).Select("id", "name", "btc_address").Find(&shortenCustodialGroups).Error; err != nil {
+	if err := s.scalarPostgresClient.Db.Model(&models.CustodialGroup{}).Select("id", "name", "taproot_address").Find(&shortenCustodialGroups).Error; err != nil {
 		return nil, err
 	}
 	return shortenCustodialGroups, nil

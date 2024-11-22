@@ -127,3 +127,8 @@ type ContractCallWithTokenApproved struct {
 	PayloadHash      sql.NullString
 	CommandId        sql.NullString
 }
+
+
+func (RelayData) TableName() string {
+	return "relay_data"
+}

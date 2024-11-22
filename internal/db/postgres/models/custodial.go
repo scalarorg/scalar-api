@@ -7,15 +7,15 @@ type Custodial struct {
 }
 
 type CustodialGroup struct {
-	ID         uint        `gorm:"primaryKey;column:id"`
-	Name       string      `gorm:"column:name"`
-	BtcAddress string      `gorm:"uniqueIndex; not null;column:taproot_address"` // Calculate from BtcPublicKeyHex of each Custodials
-	Quorum     uint        `gorm:"not null;column:quorum"`
-	Custodials []Custodial `gorm:"many2many:custodial_group_members;"`
+	ID             uint        `gorm:"primaryKey;column:id"`
+	Name           string      `gorm:"column:name"`
+	TaprootAddress string      `gorm:"uniqueIndex; not null;column:taproot_address"` // Calculate from BtcPublicKeyHex of each Custodials
+	Quorum         uint        `gorm:"not null;column:quorum"`
+	Custodials     []Custodial `gorm:"many2many:custodial_group_members;"`
 }
 
 type ShortenCustodialGroup struct {
-	ID         uint
-	Name       string
-	BtcAddress string
+	ID             uint
+	Name           string
+	TaprootAddress string
 }
