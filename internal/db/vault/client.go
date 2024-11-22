@@ -3,6 +3,7 @@ package vault
 import (
 	"context"
 	"encoding/hex"
+	"strconv"
 
 	"github.com/scalarorg/xchains-api/internal/db/postgres"
 	"github.com/scalarorg/xchains-api/internal/types"
@@ -55,8 +56,8 @@ func (c *VaultClient) getVaultByRelayData(relayData *postgres.RelayData) (*Vault
 	txHex := hex.EncodeToString(relayData.ContractCall.TxHex)
 	return &VaultDocument{
 		ID:                              relayData.ID,
-		Status:                          relayData.Status.String,
-		SimplifiedStatus:                string(postgres.ToReadableStatus(relayData.Status.String)),
+		Status:                          strconv.Itoa(int(relayData.Status.Int32)),
+		SimplifiedStatus:                string(postgres.ToReadableStatus(int(relayData.Status.Int32))),
 		SourceChain:                     relayData.From.String,
 		DestinationChain:                relayData.To.String,
 		DestinationSmartContractAddress: relayData.ContractCall.ContractAddress.String,
