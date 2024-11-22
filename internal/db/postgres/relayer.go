@@ -222,7 +222,7 @@ LEFT JOIN (
      SELECT ce."amount" as ce_amount,
             ce."reference_tx_hash" as ce_ref_tx_hash
      FROM "command_executeds" ce
-) ce ON ce_ref_tx_hash = c_tx_hash WHERE rd."status" = '2'`
+) ce ON ce_ref_tx_hash = c_tx_hash WHERE rd."status" = 2`
 
 func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
 	var relayDatas []RelayData

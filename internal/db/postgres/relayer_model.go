@@ -14,15 +14,15 @@ const (
 	Undefined RelayDataStatus = "Undefined"
 )
 
-func ToReadableStatus(status string) RelayDataStatus {
+func ToReadableStatus(status int) RelayDataStatus {
 	switch status {
-	case "0":
+	case 0:
 		return Pending
-	case "1":
+	case 1:
 		return Approved
-	case "2":
+	case 2:
 		return Success
-	case "3":
+	case 3:
 		return Failed
 	default:
 		return Undefined
@@ -33,7 +33,7 @@ type RelayData struct {
 	ID                      string `gorm:"primaryKey"`
 	PacketSequence          sql.NullInt32
 	ExecuteHash             sql.NullString
-	Status                  sql.NullString
+	Status                  sql.NullInt32
 	From                    sql.NullString
 	To                      sql.NullString
 	CreatedAt               sql.NullTime
