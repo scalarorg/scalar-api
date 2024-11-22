@@ -20,8 +20,7 @@ SELECT
     c.c_block_number, c.c_tx_hash,
     c.c_log_index, c.c_contract_address, c.c_payload, c.c_payload_hash, c.c_source_address, c.c_staker_public_key, c_sender_address, c.c_amount,
     ca.ca_source_chain, ca.ca_destination_chain, ca.ca_tx_hash, ca.ca_block_number, ca.ca_log_index, ca.ca_source_address,
-    ca.ca_contract_address, ca.ca_source_tx_hash, ca.ca_source_event_index, ca.ca_payload_hash, ca.ca_command_id,
-    ct.ct_contract_address, ct.ct_amount, ct.ct_symbol, ct.ct_payload, ct.ct_payload_hash, ct.ct_source_address
+    ca.ca_contract_address, ca.ca_source_tx_hash, ca.ca_source_event_index, ca.ca_payload_hash, ca.ca_command_id
 FROM "relay_data" rd
 LEFT JOIN (
     SELECT 
