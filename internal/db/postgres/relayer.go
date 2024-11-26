@@ -37,7 +37,7 @@ LEFT JOIN (
 		c."sender_address" as c_sender_address,
 		c."amount" as c_amount,
         ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY c."block_number") as rn
-    FROM "contract_calls" c
+    FROM "call_contracts" c
 ) c ON rd.id = c.id AND c.rn = 1
 LEFT JOIN (
     SELECT 
@@ -56,7 +56,7 @@ LEFT JOIN (
         ca."payload_hash" as ca_payload_hash, 
         ca."command_id" as ca_command_id,
         ROW_NUMBER() OVER (PARTITION BY ca."source_address", ca."contract_address", ca."payload_hash" ORDER BY ca."block_number") as rn
-    FROM "contract_call_approveds" ca
+    FROM "call_contract_approveds" ca
 ) ca ON c.c_source_address = ca."source_address" AND c.c_contract_address = ca."contract_address" AND c.c_payload_hash = ca."payload_hash" AND ca.rn = 1`
 
 // LEFT JOIN (
@@ -216,7 +216,7 @@ JOIN (
         c."source_address" as c_source_address, 
         c."staker_public_key" as c_staker_public_key,
         c."amount" as c_amount
-    FROM "contract_calls" c
+    FROM "call_contracts" c
 ) c ON rd.id = c.id 
 LEFT JOIN (
      SELECT ce."amount" as ce_amount,
