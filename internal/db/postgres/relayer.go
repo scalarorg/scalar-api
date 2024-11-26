@@ -72,14 +72,33 @@ LEFT JOIN (
 //     FROM "call_contract_with_tokens" ct
 // ) ct ON rd.id = ct.id AND ct.rn = 1`
 
-func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
+func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, int, *types.Error) {
 	var relayDatas []RelayData
+	var totalCount int
+
 	if options.Size <= 0 {
 		options.Size = 10
 	}
 	if options.Offset < 0 {
 		options.Offset = 0
 	}
+
+	// Build the count query
+	countQuery := `SELECT COUNT(*) FROM "relay_data" rd`
+	if options.EventId != "" {
+		countQuery = countQuery + " WHERE rd.id = ?"
+		err := c.PgClient.Db.Raw(countQuery, options.EventId).Scan(&totalCount).Error
+		if err != nil {
+			return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+		}
+	} else {
+		err := c.PgClient.Db.Raw(countQuery).Scan(&totalCount).Error
+		if err != nil {
+			return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+		}
+	}
+
+	// Original query logic remains the same
 	query := QUERY_RELAYDATA
 	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("GetRelayerDatas with Event Id: %s", options.EventId))
 	if options.EventId != "" {
@@ -96,7 +115,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	}
 	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("Query: %+v", err))
 	if err != nil {
-		return relayDatas, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+		return relayDatas, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -156,7 +175,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	// if result.Error != nil {
 	// 	return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, result.Error)
 	// }
-	return relayDatas, nil
+	return relayDatas, totalCount, nil
 }
 
 // func (c *RelayerClient) GetRelayerDatas0(ctx context.Context, options *Options) ([]RelayData, *types.Error) {

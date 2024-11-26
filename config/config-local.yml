@@ -16,10 +16,10 @@ mongodb:
   db-batch-size-limit: 100
   logical-shard-count: 2
 
-scalardb:
+db:
   host: "localhost"
-  port: 5462
-  db-name: "scalar"
+  port: 5432
+  db-name: "relayer"
   user: "postgres"
   password: "postgres"
   log-level: "debug"

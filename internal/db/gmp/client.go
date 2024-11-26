@@ -41,7 +41,7 @@ func normalizeEventType(eventType string) string {
 	parts := strings.Split(eventType, ".")
 	return parts[len(parts)-1]
 }
-func (c *GmpClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([]*GMPDocument, *types.Error) {
+func (c *GmpClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([]*GMPDocument, int, *types.Error) {
 	options := &postgres.Options{}
 	if payload != nil {
 		options.Size = payload.Size
@@ -57,27 +57,39 @@ func (c *GmpClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([
 		}
 	}
 
-	relayDatas, err := c.relayer.GetRelayerDatas(ctx, options)
+	relayDatas, total, err := c.relayer.GetRelayerDatas(ctx, options)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return c.getGMPByRelayDatas(ctx, relayDatas)
+	result, err := c.getGMPByRelayDatas(ctx, relayDatas)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, total, nil
 }
-func (c *GmpClient) getGMPByMessageID(ctx context.Context, messageID string, options *postgres.Options) ([]*GMPDocument, *types.Error) {
+func (c *GmpClient) getGMPByMessageID(ctx context.Context, messageID string, options *postgres.Options) ([]*GMPDocument, int, *types.Error) {
 	options.EventId = messageID
-	relayDatas, err := c.relayer.GetRelayerDatas(ctx, options)
+	relayDatas, total, err := c.relayer.GetRelayerDatas(ctx, options)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return c.getGMPByRelayDatas(ctx, relayDatas)
+	result, err := c.getGMPByRelayDatas(ctx, relayDatas)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, total, nil
 }
-func (c *GmpClient) getGMPByTxHash(ctx context.Context, txHash string, options *postgres.Options) ([]*GMPDocument, *types.Error) {
-	relayDatas, err := c.relayer.GetRelayerDatas(ctx, options)
+func (c *GmpClient) getGMPByTxHash(ctx context.Context, txHash string, options *postgres.Options) ([]*GMPDocument, int, *types.Error) {
+	relayDatas, total, err := c.relayer.GetRelayerDatas(ctx, options)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return c.getGMPByRelayDatas(ctx, relayDatas)
+	result, err := c.getGMPByRelayDatas(ctx, relayDatas)
+	if err != nil {
+		return nil, 0, err
+	}
+	return result, total, nil
 }
 
 func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgres.RelayData) ([]*GMPDocument, *types.Error) {
