@@ -37,12 +37,7 @@ func New(
 	gmpClient := gmp.New(scalarPostgresClient)
 	vaultClient := vault.New(scalarPostgresClient)
 	scalarClient := postgres.NewScalarClient(scalarPostgresClient)
-	// Migrate the tables
-	err = scalarClient.MigrateTables()
-	if err != nil {
-		log.Ctx(ctx).Fatal().Err(err).Msg("error while migrating Scalar tables")
-		return nil, err
-	}
+
 	// Init dApps
 	err = scalarClient.InitDApps(cfg.InitDApps)
 	if err != nil {

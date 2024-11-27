@@ -20,20 +20,6 @@ func NewScalarClient(scalarPostgresClient *PostgresClient) *ScalarClient {
 	}
 }
 
-func (s *ScalarClient) MigrateTables() error {
-	return s.scalarPostgresClient.Db.AutoMigrate(
-		&models.Custodial{},
-		&models.DApp{},
-		&models.CustodialGroup{},
-		&RelayData{},
-		&ContractCall{},
-		&ContractCallWithToken{},
-		&ContractCallApproved{},
-		&ContractCallWithTokenApproved{},
-		&CommandExecuted{},
-	)
-}
-
 func (s *ScalarClient) InitDApps(cfg config.InitDAppsConfig) error {
 	// Check config chains path and runtime chains path
 	if cfg.ConfigChainsPath == "" || cfg.RuntimeChainsPath == "" {
