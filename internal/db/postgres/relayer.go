@@ -59,6 +59,8 @@ LEFT JOIN (
     FROM "call_contract_approveds" ca
 ) ca ON c.c_source_address = ca."source_address" AND c.c_contract_address = ca."contract_address" AND c.c_payload_hash = ca."payload_hash" AND ca.rn = 1`
 
+const QUERY_RELAYDATA_COUNT = `SELECT COUNT(*) FROM "relay_data" rd`
+
 // LEFT JOIN (
 //     SELECT
 //         ct.id,
@@ -72,14 +74,26 @@ LEFT JOIN (
 //     FROM "call_contract_with_tokens" ct
 // ) ct ON rd.id = ct.id AND ct.rn = 1`
 
-func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
+func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, int, *types.Error) {
 	var relayDatas []RelayData
+	var totalCount int
+
 	if options.Size <= 0 {
 		options.Size = 10
 	}
 	if options.Offset < 0 {
 		options.Offset = 0
 	}
+
+	// Only perform count query when not searching by ID
+	if options.EventId == "" {
+		err := c.PgClient.Db.Raw(QUERY_RELAYDATA_COUNT).Scan(&totalCount).Error
+		if err != nil {
+			return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+		}
+	}
+
+	// Original query logic remains the same
 	query := QUERY_RELAYDATA
 	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("GetRelayerDatas with Event Id: %s", options.EventId))
 	if options.EventId != "" {
@@ -96,7 +110,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	}
 	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("Query: %+v", err))
 	if err != nil {
-		return relayDatas, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+		return relayDatas, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -154,9 +168,15 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 
 	// result := c.PgClient.Db.Limit(options.Size).Offset(options.Offset).Order("createdAt desc").Find(&relayDatas)
 	// if result.Error != nil {
-	// 	return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, result.Error)
+	//  return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, result.Error)
 	// }
-	return relayDatas, nil
+
+	// For EventId searches, use the length of results as the count
+	if options.EventId != "" {
+		totalCount = len(relayDatas)
+	}
+
+	return relayDatas, totalCount, nil
 }
 
 // func (c *RelayerClient) GetRelayerDatas0(ctx context.Context, options *Options) ([]RelayData, *types.Error) {

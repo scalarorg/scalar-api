@@ -8,13 +8,13 @@ import (
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
-func (s *Services) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([]*gmp.GMPDocument, *types.Error) {
-	gmps, err := s.GmpClient.GMPSearch(ctx, payload)
+func (s *Services) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([]*gmp.GMPDocument, int, *types.Error) {
+	gmps, total, err := s.GmpClient.GMPSearch(ctx, payload)
 	if err != nil {
-		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
+		return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
 	if gmps == nil {
 		gmps = []*gmp.GMPDocument{}
 	}
-	return gmps, nil
+	return gmps, total, nil
 }
