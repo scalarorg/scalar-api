@@ -59,6 +59,8 @@ LEFT JOIN (
     FROM "call_contract_approveds" ca
 ) ca ON c.c_source_address = ca."source_address" AND c.c_contract_address = ca."contract_address" AND c.c_payload_hash = ca."payload_hash" AND ca.rn = 1`
 
+const QUERY_RELAYDATA_COUNT = `SELECT COUNT(*) FROM "relay_data" rd`
+
 // LEFT JOIN (
 //     SELECT
 //         ct.id,
@@ -84,7 +86,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	}
 
 	// Build the count query
-	countQuery := `SELECT COUNT(*) FROM "relay_data" rd`
+	countQuery := QUERY_RELAYDATA_COUNT
 	if options.EventId != "" {
 		countQuery = countQuery + " WHERE rd.id = ?"
 		err := c.PgClient.Db.Raw(countQuery, options.EventId).Scan(&totalCount).Error
