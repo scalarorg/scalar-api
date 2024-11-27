@@ -85,16 +85,9 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 		options.Offset = 0
 	}
 
-	// Build the count query
-	countQuery := QUERY_RELAYDATA_COUNT
-	if options.EventId != "" {
-		countQuery = countQuery + " WHERE rd.id = ?"
-		err := c.PgClient.Db.Raw(countQuery, options.EventId).Scan(&totalCount).Error
-		if err != nil {
-			return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
-		}
-	} else {
-		err := c.PgClient.Db.Raw(countQuery).Scan(&totalCount).Error
+	// Only perform count query when not searching by ID
+	if options.EventId == "" {
+		err := c.PgClient.Db.Raw(QUERY_RELAYDATA_COUNT).Scan(&totalCount).Error
 		if err != nil {
 			return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 		}
@@ -175,8 +168,14 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 
 	// result := c.PgClient.Db.Limit(options.Size).Offset(options.Offset).Order("createdAt desc").Find(&relayDatas)
 	// if result.Error != nil {
-	// 	return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, result.Error)
+	//  return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, result.Error)
 	// }
+
+	// For EventId searches, use the length of results as the count
+	if options.EventId != "" {
+		totalCount = len(relayDatas)
+	}
+
 	return relayDatas, totalCount, nil
 }
 
