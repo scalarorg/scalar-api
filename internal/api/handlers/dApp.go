@@ -82,6 +82,14 @@ func parseIdDAppPayload(request *http.Request) (*IdRequestPayload, *types.Error)
 	return payload, nil
 }
 
+// CreateDApp godoc
+// @Summary Create dApp
+// @Description Creates a new dApp
+// @Tags dApp
+// @Accept json
+// @Produce json
+// @Success 200 {object} PublicResponse[CreateDAppRequestPayload] "Created dApp"
+// @Router /v1/dApp [post]
 func (h *Handler) CreateDApp(request *http.Request) (*Result, *types.Error) {
 	payload, err := parseCreateDAppPayload(request)
 	if err != nil {
@@ -110,6 +118,13 @@ func (h *Handler) CreateDApp(request *http.Request) (*Result, *types.Error) {
 	return NewResult(payload), nil
 }
 
+// GetDApp godoc
+// @Summary Get dApps
+// @Description Retrieves all dApps
+// @Tags dApp
+// @Produce json
+// @Success 200 {object} PublicResponse[[]models.DApp] "List of dApps"
+// @Router /v1/dApp [get]
 func (h *Handler) GetDApp(request *http.Request) (*Result, *types.Error) {
 	// FUTURE WORK: Implement pagination
 	// paginationKey, err := parsePaginationQuery(request)
@@ -126,6 +141,13 @@ func (h *Handler) GetDApp(request *http.Request) (*Result, *types.Error) {
 	return NewResult(dApps), nil
 }
 
+// UpdateDApp godoc
+// @Summary Update dApp
+// @Description Updates a dApp
+// @Tags dApp
+// @Produce json
+// @Success 200 {object} PublicResponse[UpdateDAppRequestPayload] "Updated dApp"
+// @Router /v1/dApp [put]
 func (h *Handler) UpdateDApp(request *http.Request) (*Result, *types.Error) {
 	payload, err := parseUpdateDAppPayload(request)
 	if err != nil {
@@ -154,6 +176,13 @@ func (h *Handler) UpdateDApp(request *http.Request) (*Result, *types.Error) {
 	return NewResult(payload), nil
 }
 
+// ToggleDApp godoc
+// @Summary Toggle dApp
+// @Description Toggles a dApp
+// @Tags dApp
+// @Produce json
+// @Success 200 {object} PublicResponse[IdRequestPayload] "Toggled dApp"
+// @Router /v1/dApp [patch]
 func (h *Handler) ToggleDApp(request *http.Request) (*Result, *types.Error) {
 	payload, err := parseIdDAppPayload(request)
 	if err != nil {
@@ -166,6 +195,13 @@ func (h *Handler) ToggleDApp(request *http.Request) (*Result, *types.Error) {
 	return NewResult(payload), nil
 }
 
+// DeleteDApp godoc
+// @Summary Delete dApp
+// @Description Deletes a dApp
+// @Tags dApp
+// @Produce json
+// @Success 200 {string} string "Delete successfully"
+// @Router /v1/dApp [delete]
 func (h *Handler) DeleteDApp(request *http.Request) (*Result, *types.Error) {
 	payload, err := parseIdDAppPayload(request)
 	if err != nil {

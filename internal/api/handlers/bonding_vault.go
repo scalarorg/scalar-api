@@ -16,6 +16,14 @@ func parseVaultPayload(request *http.Request) (*types.VaultPayload, *types.Error
 	return payload, nil
 }
 
+// SearchVault godoc
+// @Summary Search vaults
+// @Description Searches for vaults based on the provided payload
+// @Tags vault
+// @Accept json
+// @Produce json
+// @Success 200 {object} PublicResponse[[]vault.VaultDocument] "List of vaults"
+// @Router /v1/vault/searchVault [post]
 func (h *Handler) SearchVault(request *http.Request) (*Result, *types.Error) {
 	vaultPayload, err := parseVaultPayload(request)
 	if err != nil {

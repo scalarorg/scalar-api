@@ -32,57 +32,96 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/delegation": {
+        "/v1/dApp": {
             "get": {
-                "description": "Retrieves a delegation by a given transaction hash",
+                "description": "Retrieves all dApps",
                 "produces": [
                     "application/json"
                 ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Staking transaction hash in hex format",
-                        "name": "staking_tx_hash_hex",
-                        "in": "query",
-                        "required": true
-                    }
+                "tags": [
+                    "dApp"
                 ],
+                "summary": "Get dApps",
                 "responses": {
                     "200": {
-                        "description": "Delegation",
+                        "description": "List of dApps",
                         "schema": {
-                            "$ref": "#/definitions/handlers.PublicResponse-services_DelegationPublic"
-                        }
-                    },
-                    "400": {
-                        "description": "Error: Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_babylonchain_xchains-api_internal_types.Error"
+                            "$ref": "#/definitions/handlers.PublicResponse-array_models_DApp"
                         }
                     }
                 }
-            }
-        },
-        "/v1/finality-providers": {
-            "get": {
-                "description": "Fetches details of all active finality providers sorted by their active total value locked (ActiveTvl) in descending order.",
+            },
+            "put": {
+                "description": "Updates a dApp",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get Active Finality Providers",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Pagination key to fetch the next page of finality providers",
-                        "name": "pagination_key",
-                        "in": "query"
-                    }
+                "tags": [
+                    "dApp"
                 ],
+                "summary": "Update dApp",
                 "responses": {
                     "200": {
-                        "description": "A list of finality providers sorted by ActiveTvl in descending order",
+                        "description": "Updated dApp",
                         "schema": {
-                            "$ref": "#/definitions/handlers.PublicResponse-array_services_FpDetailsPublic"
+                            "$ref": "#/definitions/handlers.PublicResponse-handlers_UpdateDAppRequestPayload"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new dApp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dApp"
+                ],
+                "summary": "Create dApp",
+                "responses": {
+                    "200": {
+                        "description": "Created dApp",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.PublicResponse-handlers_CreateDAppRequestPayload"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a dApp",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dApp"
+                ],
+                "summary": "Delete dApp",
+                "responses": {
+                    "200": {
+                        "description": "Delete successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Toggles a dApp",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dApp"
+                ],
+                "summary": "Toggle dApp",
+                "responses": {
+                    "200": {
+                        "description": "Toggled dApp",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.PublicResponse-handlers_IdRequestPayload"
                         }
                     }
                 }
@@ -90,11 +129,11 @@ const docTemplate = `{
         },
         "/v1/global-params": {
             "get": {
-                "description": "Retrieves the global parameters for Babylon, including finality provider details.",
+                "description": "Retrieves the global parameters for Scalar, including finality provider details.",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get Babylon global parameters",
+                "summary": "Get Scalar global parameters",
                 "responses": {
                     "200": {
                         "description": "Global parameters",
@@ -105,189 +144,47 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/staker/delegation/check": {
-            "get": {
-                "description": "Check if a staker has an active delegation by the staker BTC address (Taproot only)\nOptionally, you can provide a timeframe to check if the delegation is active within the provided timeframe\nThe available timeframe is \"today\" which checks after UTC 12AM of the current day",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Staker BTC address in Taproot format",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "enum": [
-                            "today"
-                        ],
-                        "type": "string",
-                        "description": "Check if the delegation is active within the provided timeframe",
-                        "name": "timeframe",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Result",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.Result"
-                        }
-                    },
-                    "400": {
-                        "description": "Error: Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_babylonchain_xchains-api_internal_types.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/staker/delegations": {
-            "get": {
-                "description": "Retrieves delegations for a given staker",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Staker BTC Public Key",
-                        "name": "staker_btc_pk",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Pagination key to fetch the next page of delegations",
-                        "name": "pagination_key",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of delegations and pagination token",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.PublicResponse-array_services_DelegationPublic"
-                        }
-                    },
-                    "400": {
-                        "description": "Error: Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_babylonchain_xchains-api_internal_types.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/stats": {
-            "get": {
-                "description": "Fetches overall stats for babylon staking including tvl, total delegations, active tvl, active delegations and total stakers.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get Overall Stats",
-                "responses": {
-                    "200": {
-                        "description": "Overall stats for babylon staking",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.PublicResponse-services_OverallStatsPublic"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/stats/staker": {
-            "get": {
-                "description": "Fetches details of top stakers by their active total value locked (ActiveTvl) in descending order.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get Top Staker Stats by Active TVL",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Pagination key to fetch the next page of top stakers",
-                        "name": "pagination_key",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of top stakers by active tvl",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.PublicResponse-array_services_StakerStatsPublic"
-                        }
-                    },
-                    "400": {
-                        "description": "Error: Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_babylonchain_xchains-api_internal_types.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/unbonding": {
+        "/v1/gmp/searchGMP": {
             "post": {
-                "description": "Unbonds a delegation by processing the provided transaction details. This is an async operation.",
+                "description": "Search for GMP transactions with filters",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Unbond delegation",
-                "parameters": [
-                    {
-                        "description": "Unbonding Request Payload",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.UnbondDelegationRequestPayload"
-                        }
-                    }
+                "tags": [
+                    "gmp"
                 ],
+                "summary": "Search GMP transactions",
                 "responses": {
-                    "202": {
-                        "description": "Request accepted and will be processed asynchronously"
-                    },
-                    "400": {
-                        "description": "Invalid request payload",
+                    "200": {
+                        "description": "List of GMP",
                         "schema": {
-                            "$ref": "#/definitions/github_com_babylonchain_xchains-api_internal_types.Error"
+                            "$ref": "#/definitions/handlers.GmpPublicResponse-array_gmp_GMPDocument"
                         }
                     }
                 }
             }
         },
-        "/v1/unbonding/eligibility": {
-            "get": {
-                "description": "Checks if a delegation identified by its staking transaction hash is eligible for unbonding.",
+        "/v1/vault/searchVault": {
+            "post": {
+                "description": "Searches for vaults based on the provided payload",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Check unbonding eligibility",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Staking Transaction Hash Hex",
-                        "name": "staking_tx_hash_hex",
-                        "in": "query",
-                        "required": true
-                    }
+                "tags": [
+                    "vault"
                 ],
+                "summary": "Search vaults",
                 "responses": {
                     "200": {
-                        "description": "The delegation is eligible for unbonding"
-                    },
-                    "400": {
-                        "description": "Missing or invalid 'staking_tx_hash_hex' query parameter",
+                        "description": "List of vaults",
                         "schema": {
-                            "$ref": "#/definitions/github_com_babylonchain_xchains-api_internal_types.Error"
+                            "$ref": "#/definitions/handlers.PublicResponse-array_vault_VaultDocument"
                         }
                     }
                 }
@@ -295,25 +192,742 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_babylonchain_xchains-api_internal_types.Error": {
+        "gmp.ConfirmDocument": {
             "type": "object",
             "properties": {
-                "err": {},
-                "errorCode": {
-                    "$ref": "#/definitions/types.ErrorCode"
+                "blockNumber": {
+                    "type": "integer"
                 },
-                "statusCode": {
+                "block_timestamp": {
+                    "type": "integer"
+                },
+                "confirmation_txhash": {
+                    "type": "string"
+                },
+                "event": {
+                    "type": "string"
+                },
+                "poll_id": {
+                    "type": "string"
+                },
+                "sourceChain": {
+                    "type": "string"
+                },
+                "sourceTransactionHash": {
+                    "type": "string"
+                },
+                "transactionHash": {
+                    "type": "string"
+                },
+                "transactionIndex": {
                     "type": "integer"
                 }
             }
         },
-        "handlers.PublicResponse-array_services_DelegationPublic": {
+        "gmp.CreatedAtDocument": {
+            "type": "object",
+            "properties": {
+                "day": {
+                    "type": "integer"
+                },
+                "hour": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "ms": {
+                    "type": "integer"
+                },
+                "quarter": {
+                    "type": "integer"
+                },
+                "week": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gmp.ExpressFeeDocument": {
+            "type": "object",
+            "properties": {
+                "express_gas_overhead_fee": {
+                    "type": "number"
+                },
+                "express_gas_overhead_fee_usd": {
+                    "type": "number"
+                },
+                "relayer_fee": {
+                    "type": "number"
+                },
+                "relayer_fee_usd": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+                },
+                "total_usd": {
+                    "type": "number"
+                }
+            }
+        },
+        "gmp.ExpressGasPriceRateDocument": {
+            "type": "object",
+            "properties": {
+                "axelar_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                },
+                "destination_native_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                },
+                "ethereum_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                },
+                "source_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                }
+            }
+        },
+        "gmp.FeesDocument": {
+            "type": "object",
+            "properties": {
+                "axelar_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                },
+                "base_fee": {
+                    "type": "number"
+                },
+                "destination_base_fee": {
+                    "type": "number"
+                },
+                "destination_base_fee_string": {
+                    "type": "string"
+                },
+                "destination_base_fee_usd": {
+                    "type": "number"
+                },
+                "destination_confirm_fee": {
+                    "type": "number"
+                },
+                "destination_express_fee": {
+                    "$ref": "#/definitions/gmp.ExpressFeeDocument"
+                },
+                "destination_native_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                },
+                "ethereum_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                },
+                "execute_gas_multiplier": {
+                    "type": "number"
+                },
+                "execute_min_gas_price": {
+                    "type": "string"
+                },
+                "express_execute_gas_multiplier": {
+                    "type": "number"
+                },
+                "express_fee": {
+                    "type": "number"
+                },
+                "express_fee_string": {
+                    "type": "string"
+                },
+                "express_fee_usd": {
+                    "type": "number"
+                },
+                "express_supported": {
+                    "type": "boolean"
+                },
+                "source_base_fee": {
+                    "type": "number"
+                },
+                "source_base_fee_usd": {
+                    "type": "number"
+                },
+                "source_confirm_fee": {
+                    "type": "number"
+                },
+                "source_express_fee": {
+                    "$ref": "#/definitions/gmp.ExpressFeeDocument"
+                },
+                "source_token": {
+                    "$ref": "#/definitions/gmp.TokenDocument"
+                }
+            }
+        },
+        "gmp.GMPDocument": {
+            "type": "object",
+            "properties": {
+                "approved": {
+                    "$ref": "#/definitions/gmp.GMPStepDocument"
+                },
+                "call": {
+                    "$ref": "#/definitions/gmp.GMPStepDocument"
+                },
+                "command_id": {
+                    "type": "string"
+                },
+                "confirm": {
+                    "$ref": "#/definitions/gmp.ConfirmDocument"
+                },
+                "confirm_failed": {
+                    "type": "boolean"
+                },
+                "confirm_failed_event": {
+                    "type": "string"
+                },
+                "day": {
+                    "type": "integer"
+                },
+                "execute_nonce": {
+                    "type": "string"
+                },
+                "execute_pending_transaction_hash": {
+                    "type": "string"
+                },
+                "executed": {
+                    "$ref": "#/definitions/gmp.GMPStepDocument"
+                },
+                "executing_at": {
+                    "type": "integer"
+                },
+                "express_gas_price_rate": {
+                    "$ref": "#/definitions/gmp.ExpressGasPriceRateDocument"
+                },
+                "fees": {
+                    "$ref": "#/definitions/gmp.FeesDocument"
+                },
+                "gas": {
+                    "$ref": "#/definitions/gmp.GasDocument"
+                },
+                "gas_paid": {
+                    "$ref": "#/definitions/gmp.GMPStepDocument"
+                },
+                "gas_price_rate": {
+                    "$ref": "#/definitions/gmp.ExpressGasPriceRateDocument"
+                },
+                "gas_status": {
+                    "type": "string"
+                },
+                "hour": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_call_from_relayer": {
+                    "type": "boolean"
+                },
+                "is_execute_from_relayer": {
+                    "type": "boolean"
+                },
+                "is_insufficient_fee": {
+                    "type": "boolean"
+                },
+                "is_invalid_amount": {
+                    "type": "boolean"
+                },
+                "is_invalid_call": {
+                    "type": "boolean"
+                },
+                "is_invalid_contract_address": {
+                    "type": "boolean"
+                },
+                "is_invalid_destination_chain": {
+                    "type": "boolean"
+                },
+                "is_invalid_gas_paid": {
+                    "type": "boolean"
+                },
+                "is_invalid_gas_paid_mismatch_source_address": {
+                    "type": "boolean"
+                },
+                "is_invalid_payload_hash": {
+                    "type": "boolean"
+                },
+                "is_invalid_source_address": {
+                    "type": "boolean"
+                },
+                "is_invalid_symbol": {
+                    "type": "boolean"
+                },
+                "is_not_enough_gas": {
+                    "type": "boolean"
+                },
+                "is_two_way": {
+                    "type": "boolean"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "ms": {
+                    "type": "integer"
+                },
+                "not_enough_gas_to_execute": {
+                    "type": "boolean"
+                },
+                "quarter": {
+                    "type": "integer"
+                },
+                "refund_nonce": {
+                    "type": "string"
+                },
+                "refunded": {
+                    "$ref": "#/definitions/gmp.GMPStepDocument"
+                },
+                "refunding_at": {
+                    "type": "integer"
+                },
+                "simplified_status": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "time_spent": {
+                    "$ref": "#/definitions/gmp.TimeSpentDocument"
+                },
+                "to_refund": {
+                    "type": "boolean"
+                },
+                "week": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gmp.GMPStepDocument": {
+            "type": "object",
+            "properties": {
+                "_logIndex": {
+                    "type": "integer"
+                },
+                "_type": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "blockHash": {
+                    "type": "string"
+                },
+                "blockNumber": {
+                    "type": "integer"
+                },
+                "block_timestamp": {
+                    "type": "integer"
+                },
+                "chain": {
+                    "type": "string"
+                },
+                "chain_type": {
+                    "type": "string"
+                },
+                "contract_address": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "$ref": "#/definitions/gmp.CreatedAtDocument"
+                },
+                "destination_chain_type": {
+                    "type": "string"
+                },
+                "event": {
+                    "type": "string"
+                },
+                "eventIndex": {
+                    "type": "integer"
+                },
+                "eventSignature": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logIndex": {
+                    "type": "integer"
+                },
+                "proposal_id": {
+                    "type": "string"
+                },
+                "receipt": {
+                    "$ref": "#/definitions/gmp.ReceiptDocument"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "returnValues": {
+                    "$ref": "#/definitions/gmp.ReturnValuesDocument"
+                },
+                "sourceChain": {
+                    "type": "string"
+                },
+                "topics": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "transaction": {
+                    "$ref": "#/definitions/gmp.TransactionDocument"
+                },
+                "transactionHash": {
+                    "type": "string"
+                },
+                "transactionIndex": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gmp.GasDocument": {
+            "type": "object",
+            "properties": {
+                "gas_approve_amount": {
+                    "type": "number"
+                },
+                "gas_base_fee_amount": {
+                    "type": "number"
+                },
+                "gas_execute_amount": {
+                    "type": "number"
+                },
+                "gas_express_amount": {
+                    "type": "number"
+                },
+                "gas_express_fee_amount": {
+                    "type": "number"
+                },
+                "gas_paid_amount": {
+                    "type": "number"
+                },
+                "gas_remain_amount": {
+                    "type": "number"
+                },
+                "gas_used_amount": {
+                    "type": "number"
+                },
+                "gas_used_value": {
+                    "type": "number"
+                }
+            }
+        },
+        "gmp.GasPriceInUnitsDocument": {
+            "type": "object",
+            "properties": {
+                "decimals": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "gmp.LogDocument": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "blockHash": {
+                    "type": "string"
+                },
+                "blockNumber": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "logIndex": {
+                    "type": "integer"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "topics": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "transactionHash": {
+                    "type": "string"
+                },
+                "transactionIndex": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gmp.ReceiptDocument": {
+            "type": "object",
+            "properties": {
+                "blockHash": {
+                    "type": "string"
+                },
+                "blockNumber": {
+                    "type": "integer"
+                },
+                "confirmations": {
+                    "type": "integer"
+                },
+                "contractAddress": {
+                    "type": "string"
+                },
+                "cumulativeGasUsed": {
+                    "type": "string"
+                },
+                "effectiveGasPrice": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "gasUsed": {
+                    "type": "string"
+                },
+                "logs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/gmp.LogDocument"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "to": {
+                    "type": "string"
+                },
+                "transactionHash": {
+                    "type": "string"
+                },
+                "transactionIndex": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gmp.ReturnValuesDocument": {
+            "type": "object",
+            "properties": {
+                "commandId": {
+                    "type": "string"
+                },
+                "contractAddress": {
+                    "type": "string"
+                },
+                "destinationChain": {
+                    "type": "string"
+                },
+                "destinationContractAddress": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "payloadHash": {
+                    "type": "string"
+                },
+                "sender": {
+                    "type": "string"
+                },
+                "sourceAddress": {
+                    "type": "string"
+                },
+                "sourceChain": {
+                    "type": "string"
+                },
+                "sourceEventIndex": {
+                    "type": "string"
+                },
+                "sourceTxHash": {
+                    "type": "string"
+                }
+            }
+        },
+        "gmp.TimeSpentDocument": {
+            "type": "object",
+            "properties": {
+                "approved_executed": {
+                    "type": "integer"
+                },
+                "call_approved": {
+                    "type": "integer"
+                },
+                "call_confirm": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gmp.TokenDocument": {
+            "type": "object",
+            "properties": {
+                "contract_address": {
+                    "type": "string"
+                },
+                "decimals": {
+                    "type": "integer"
+                },
+                "gas_price": {
+                    "type": "string"
+                },
+                "gas_price_gwei": {
+                    "type": "string"
+                },
+                "gas_price_in_units": {
+                    "$ref": "#/definitions/gmp.GasPriceInUnitsDocument"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "token_price": {
+                    "$ref": "#/definitions/gmp.TokenPriceDocument"
+                }
+            }
+        },
+        "gmp.TokenPriceDocument": {
+            "type": "object",
+            "properties": {
+                "usd": {
+                    "type": "number"
+                }
+            }
+        },
+        "gmp.TransactionDocument": {
+            "type": "object",
+            "properties": {
+                "blockHash": {
+                    "type": "string"
+                },
+                "blockNumber": {
+                    "type": "integer"
+                },
+                "chainId": {
+                    "type": "integer"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "gas": {
+                    "type": "string"
+                },
+                "gasPrice": {
+                    "type": "string"
+                },
+                "hash": {
+                    "type": "string"
+                },
+                "maxFeePerGas": {
+                    "type": "string"
+                },
+                "maxPriorityFeePerGas": {
+                    "type": "string"
+                },
+                "nonce": {
+                    "type": "integer"
+                },
+                "r": {
+                    "type": "string"
+                },
+                "s": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "string"
+                },
+                "transactionIndex": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "v": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
+                },
+                "yParity": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.CreateDAppRequestPayload": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "btc_address_hex": {
+                    "type": "string"
+                },
+                "chain_endpoint": {
+                    "type": "string"
+                },
+                "chain_id": {
+                    "type": "string"
+                },
+                "chain_name": {
+                    "type": "string"
+                },
+                "custodial_group_id": {
+                    "type": "integer"
+                },
+                "public_key_hex": {
+                    "type": "string"
+                },
+                "rpc_url": {
+                    "type": "string"
+                },
+                "smart_contract_address": {
+                    "description": "UPDATE: New field",
+                    "type": "string"
+                },
+                "token_contract_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.GmpPublicResponse-array_gmp_GMPDocument": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/services.DelegationPublic"
+                        "$ref": "#/definitions/gmp.GMPDocument"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.IdRequestPayload": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.PublicResponse-array_models_DApp": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DApp"
                     }
                 },
                 "pagination": {
@@ -321,13 +935,13 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.PublicResponse-array_services_FpDetailsPublic": {
+        "handlers.PublicResponse-array_vault_VaultDocument": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/services.FpDetailsPublic"
+                        "$ref": "#/definitions/vault.VaultDocument"
                     }
                 },
                 "pagination": {
@@ -335,25 +949,33 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.PublicResponse-array_services_StakerStatsPublic": {
+        "handlers.PublicResponse-handlers_CreateDAppRequestPayload": {
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/services.StakerStatsPublic"
-                    }
+                    "$ref": "#/definitions/handlers.CreateDAppRequestPayload"
                 },
                 "pagination": {
                     "$ref": "#/definitions/handlers.paginationResponse"
                 }
             }
         },
-        "handlers.PublicResponse-services_DelegationPublic": {
+        "handlers.PublicResponse-handlers_IdRequestPayload": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/services.DelegationPublic"
+                    "$ref": "#/definitions/handlers.IdRequestPayload"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/handlers.paginationResponse"
+                }
+            }
+        },
+        "handlers.PublicResponse-handlers_UpdateDAppRequestPayload": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/handlers.UpdateDAppRequestPayload"
                 },
                 "pagination": {
                     "$ref": "#/definitions/handlers.paginationResponse"
@@ -371,39 +993,41 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.PublicResponse-services_OverallStatsPublic": {
+        "handlers.UpdateDAppRequestPayload": {
             "type": "object",
             "properties": {
-                "data": {
-                    "$ref": "#/definitions/services.OverallStatsPublic"
+                "access_token": {
+                    "type": "string"
                 },
-                "pagination": {
-                    "$ref": "#/definitions/handlers.paginationResponse"
-                }
-            }
-        },
-        "handlers.Result": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "status": {
+                "btc_address_hex": {
+                    "type": "string"
+                },
+                "chain_endpoint": {
+                    "type": "string"
+                },
+                "chain_id": {
+                    "type": "string"
+                },
+                "chain_name": {
+                    "type": "string"
+                },
+                "custodial_group_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "handlers.UnbondDelegationRequestPayload": {
-            "type": "object",
-            "properties": {
-                "staker_signed_signature_hex": {
+                },
+                "id": {
                     "type": "string"
                 },
-                "staking_tx_hash_hex": {
+                "public_key_hex": {
                     "type": "string"
                 },
-                "unbonding_tx_hash_hex": {
+                "rpc_url": {
                     "type": "string"
                 },
-                "unbonding_tx_hex": {
+                "smart_contract_address": {
+                    "description": "UPDATE: New field",
+                    "type": "string"
+                },
+                "token_contract_address": {
                     "type": "string"
                 }
             }
@@ -416,78 +1040,82 @@ const docTemplate = `{
                 }
             }
         },
-        "services.DelegationPublic": {
+        "models.Custodial": {
             "type": "object",
             "properties": {
-                "finality_provider_pk_hex": {
+                "btcPublicKeyHex": {
                     "type": "string"
                 },
-                "is_overflow": {
-                    "type": "boolean"
-                },
-                "staker_pk_hex": {
-                    "type": "string"
-                },
-                "staking_tx": {
-                    "$ref": "#/definitions/services.TransactionPublic"
-                },
-                "staking_tx_hash_hex": {
-                    "type": "string"
-                },
-                "staking_value": {
+                "id": {
                     "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CustodialGroup": {
+            "type": "object",
+            "properties": {
+                "custodials": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Custodial"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "quorum": {
+                    "type": "integer"
+                },
+                "taprootAddress": {
+                    "description": "Calculate from BtcPublicKeyHex of each Custodials",
+                    "type": "string"
+                }
+            }
+        },
+        "models.DApp": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "btcaddressHex": {
+                    "type": "string"
+                },
+                "chainEndpoint": {
+                    "type": "string"
+                },
+                "chainID": {
+                    "type": "string"
+                },
+                "chainName": {
+                    "type": "string"
+                },
+                "custodialGroup": {
+                    "$ref": "#/definitions/models.CustodialGroup"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "publicKeyHex": {
+                    "type": "string"
+                },
+                "rpcurl": {
+                    "type": "string"
+                },
+                "smartContractAddress": {
+                    "type": "string"
                 },
                 "state": {
+                    "type": "boolean"
+                },
+                "tokenContractAddress": {
                     "type": "string"
-                },
-                "unbonding_tx": {
-                    "$ref": "#/definitions/services.TransactionPublic"
-                }
-            }
-        },
-        "services.FpDescriptionPublic": {
-            "type": "object",
-            "properties": {
-                "details": {
-                    "type": "string"
-                },
-                "identity": {
-                    "type": "string"
-                },
-                "moniker": {
-                    "type": "string"
-                },
-                "security_contact": {
-                    "type": "string"
-                },
-                "website": {
-                    "type": "string"
-                }
-            }
-        },
-        "services.FpDetailsPublic": {
-            "type": "object",
-            "properties": {
-                "active_delegations": {
-                    "type": "integer"
-                },
-                "active_tvl": {
-                    "type": "integer"
-                },
-                "btc_pk": {
-                    "type": "string"
-                },
-                "commission": {
-                    "type": "string"
-                },
-                "description": {
-                    "$ref": "#/definitions/services.FpDescriptionPublic"
-                },
-                "total_delegations": {
-                    "type": "integer"
-                },
-                "total_tvl": {
-                    "type": "integer"
                 }
             }
         },
@@ -499,69 +1127,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/services.VersionedGlobalParamsPublic"
                     }
-                }
-            }
-        },
-        "services.OverallStatsPublic": {
-            "type": "object",
-            "properties": {
-                "active_delegations": {
-                    "type": "integer"
-                },
-                "active_tvl": {
-                    "type": "integer"
-                },
-                "total_delegations": {
-                    "type": "integer"
-                },
-                "total_stakers": {
-                    "type": "integer"
-                },
-                "total_tvl": {
-                    "type": "integer"
-                },
-                "unconfirmed_tvl": {
-                    "type": "integer"
-                }
-            }
-        },
-        "services.StakerStatsPublic": {
-            "type": "object",
-            "properties": {
-                "active_delegations": {
-                    "type": "integer"
-                },
-                "active_tvl": {
-                    "type": "integer"
-                },
-                "staker_pk_hex": {
-                    "type": "string"
-                },
-                "total_delegations": {
-                    "type": "integer"
-                },
-                "total_tvl": {
-                    "type": "integer"
-                }
-            }
-        },
-        "services.TransactionPublic": {
-            "type": "object",
-            "properties": {
-                "output_index": {
-                    "type": "integer"
-                },
-                "start_height": {
-                    "type": "integer"
-                },
-                "start_timestamp": {
-                    "type": "string"
-                },
-                "timelock": {
-                    "type": "integer"
-                },
-                "tx_hex": {
-                    "type": "string"
                 }
             }
         },
@@ -615,22 +1180,52 @@ const docTemplate = `{
                 }
             }
         },
-        "types.ErrorCode": {
-            "type": "string",
-            "enum": [
-                "INTERNAL_SERVICE_ERROR",
-                "VALIDATION_ERROR",
-                "NOT_FOUND",
-                "BAD_REQUEST",
-                "FORBIDDEN"
-            ],
-            "x-enum-varnames": [
-                "InternalServiceError",
-                "ValidationError",
-                "NotFound",
-                "BadRequest",
-                "Forbidden"
-            ]
+        "vault.VaultDocument": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "destination_chain": {
+                    "type": "string"
+                },
+                "destination_smart_contract_address": {
+                    "type": "string"
+                },
+                "executed_amount": {
+                    "type": "string"
+                },
+                "executed_ref_tx_hash": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "simplified_status": {
+                    "type": "string"
+                },
+                "source_chain": {
+                    "type": "string"
+                },
+                "source_tx_hash": {
+                    "type": "string"
+                },
+                "source_tx_hex": {
+                    "type": "string"
+                },
+                "staker_pubkey": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`

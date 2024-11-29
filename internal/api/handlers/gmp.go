@@ -113,6 +113,14 @@ func (h *Handler) GMPTopITSAssets(request *http.Request) (*Result, *types.Error)
 	return NewResult(gmps), nil
 }
 
+// GMPSearch godoc
+// @Summary Search GMP transactions
+// @Description Search for GMP transactions with filters
+// @Tags gmp
+// @Accept json
+// @Produce json
+// @Success 200 {object} GmpPublicResponse[[]gmp.GMPDocument] "List of GMP"
+// @Router /v1/gmp/searchGMP [post]
 func (h *Handler) GMPSearch(request *http.Request) (*Result, *types.Error) {
 	gmpPayload, err := parseGmpPayload(request)
 	if err != nil {
