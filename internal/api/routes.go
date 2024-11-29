@@ -13,7 +13,7 @@ func (a *Server) SetupRoutes(r *chi.Mux) {
 
 	r.Post("/v1/staker/staking-psbt/create", registerHandler(handlers.CreateStakingPsbt))
 	r.Post("/v1/staker/unstaking-psbt/create", registerHandler(handlers.CreateUnstakingPsbt))
-	r.Get("/v1/global-params", registerHandler(handlers.GetBabylonGlobalParams))
+	r.Get("/v1/global-params", registerHandler(handlers.GetScalarGlobalParams))
 
 	registerParamsHandler(r, handlers)
 	registerDAppHandler(r, handlers)

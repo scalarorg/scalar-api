@@ -1,79 +1,77 @@
 # Staking API Service
 
-The Staking API Service is a critical component of the Babylon Phase-1 system,
-focused on serving information about the state of the network and
-receiving unbonding requests for further processing.
-The API can be utilised by user facing applications, such as staking dApps.
+> 2024-11-29 @DanteBartel
 
-## Architectural Design
+## 🌟 Overview
 
-![Staking Service Architecture](images/architectural-design.jpg)
+The Staking API Service is focused on serving information about dApps, general message passing (GMP) and staking transactions. These information can be utilised by Scalar Staking app and Scanner app for user to review and interact with.
 
-This architecture is centered around a message-driven approach,
-utilizing RabbitMQ queues for inter-service communication.
-Such a design facilitates high concurrency and enhances fault tolerance by
-allowing for horizontal scaling and leveraging RabbitMQ's message retry features.
-The primary infrastructure components include:
+## 🌟 Key Features
 
-1. MongoDB
-2. RabbitMQ
-3. Redis cache (Work In Progress)
+1. DApps
+   - Serve information about dApps
+   - CRUD methods for dApps
+   - Serve information about Custodials
+2. GMP
+   - Serve information about GMP
+3. Staking transactions
+   - Serve information about staking transactions
 
-### Key Features
+## 🌟 Components
 
-- **Asynchronous Communication**: Enables decoupled, non-blocking inter-service
-  interactions, aside from the unbonding pipeline which follows a different interaction pattern.
-- **Fault Tolerance**: Utilizes RabbitMQ's message retry mechanism for resilience
-  against transient failures.
-- **Horizontal Scalability**: Supports increasing system capacity by
-  adding more processing nodes as demand grows.
+The application is structured with the following key components:
 
-For more detailed rules applied to message processing,
-refer to the [queue handler documentation](internal/queue/handlers/REAME.md).
+### Core Components
 
-### Workflow
+- **API Handlers**
 
-#### Standard Staking Path
+  - `HealthCheck`: Health check endpoint for service monitoring
+  - `StakingHandler`: Manages staking operations and queries
 
-The standard staking path encompasses user-initiated staking through CLI/UI,
-followed by waiting for the staking period (timelock) to expire.
+- **Service Layer**
 
-1. **Transaction Submission**: User-submitted staking transactions are
-   confirmed and picked up by the [indexer](https://github.com/babylonchain/staking-indexer)
-   after receiving sufficient Bitcoin block confirmations.
-2. **Event Queuing**: The indexer sends `ActiveStakingEvent` [messages](https://github.com/scalarorg/staking-queue-client/blob/main/client/schema.go#L24)
-   to the Active Event Queue for the staking API service to process.
-3. **Processing and State Management**: The staking API service executes statistical calculations,
-   data transformation, and staking state management, inserting records into the `timelock_queue` collection.
-4. **Timelock Expiry Monitoring**: A dedicated service monitors the `timelock_queue` for
-   records with expired Bitcoin Staking timelocks and signals the staking API service
-   to update the staking delegation status to `unbonded`.
-   This status displays to the user that the staking transaction is ready for withdrawal.
+  - `StakingService`: Business logic for staking operations
+  - `FinalityProviderService`: Manages finality provider operations
 
-#### Early Unbonding Path
+- **Database Layer**
+  - `PostgreSQL`: Primary data store using GORM
 
-The early unbonding path enables users to on-demand unlock their staked Bitcoin
-before the timelock of the staking transaction expires.
+### Infrastructure Components
 
-1. **Signature Submission**: Via the UI/CLI, users can initiate an early unbonding action,
-   which involves generating an unbonding transaction and creating a signature for it,
-   both of which are forwarded to the staking API service.
-2. **Signature Verification and Storage**: The staking API service validates the signature
-   against the unbonding transaction and
-   stores it for further processing by the unbonding pipeline.
-3. **Committee Co-Signing**: The unbonding pipeline collects additional signatures
-   from the covenant committee and submits the unbonding transaction to the Bitcoin network.
-4. **Transaction Detection**: The unbonding transaction is detected by the staking-indexer
-   once it receives a sufficient number of confirmations and a corresponding [unbonding event](https://github.com/scalarorg/staking-queue-client/blob/main/client/schema.go#L70)
-   is placed into the RabbitMQ queue.
-5. **Processing and State Management**: Similar to the standard path, the staking API service
-   handles statistical updates, adjusts the staking state, and inserts a record into the `timelock_queue`.
-6. **Finalization**: The expire-service processes items from the `timelock_queue` in
-   MongoDB and emits an [expired event](https://github.com/scalarorg/staking-queue-client/blob/main/client/schema.go#L130)
-   to RabbitMQ for the xchains-api to process. This marks completed staking
-   transactions as `unbonded`. This status displays to the user that the staking transaction is ready for withdrawal.
+- **Configuration**
 
-## Getting Started
+  - `ConfigLoader`: Handles YAML-based configuration
+  - `EnvironmentLoader`: Manages environment variables
+  - `FinalityProviderConfig`: Manages finality provider settings
+
+- **Middleware**
+  - `CORS`: Cross-Origin Resource Sharing handler
+  - `Security`: Request security middleware
+  - `Swagger`: API documentation middleware
+
+### Directory Structure
+
+```
+src/
+├── api/          # API handlers and routes
+├── config/       # Configuration files
+├── docs/         # API documentation
+├── internal/     # Internal packages
+│   ├── service/  # Logic services
+│   ├── models/   # Data models
+│   └── db/       # Database interfaces
+└── cmd/          # Application entry points
+```
+
+The service uses the following key dependencies:
+
+- Chi router for HTTP routing
+- GORM for database operations
+- Swagger for API documentation
+- Prometheus for metrics
+- Zerolog for logging
+
+## 🌟 Getting Started
 
 ### Prerequisites
 
@@ -85,22 +83,12 @@ before the timelock of the staking transaction expires.
 1. Clone the repository:
 
 ```bash
-git clone git@github.com:scalarorg/xchains-api.git
+git clone https://github.com/scalarorg/scalar-api
 ```
 
-2. Prepare the enviroment
+2. Prepare the config
 
-Specify the required environment variables in the `.env` file in the root directory:
-
-```
-cp .env.sample .env
-```
-
-where,
-
-- `COVENANT_PUBLIC_KEYS` specifies the public keys of the covenants
-- `COVENANT_QUORUM` specifies the number of covenant signatures needed when unbonding
-- `TAG` and `VERSION` specify the tag and version of the staking data script
+Edit the `config/config-local.yml` file to match your local environment.
 
 3. Run the service:
 
@@ -114,9 +102,9 @@ OR, you can run as a docker container
 make start-xchains-api
 ```
 
-4. Open your browser and navigate to `http://localhost` to see the api server running.
+4. Open your browser and navigate to `http://localhost:<port>` to see the api server running, where `<port>` is the port specified in the `config/config-local.yml` file.
 
-### Tests
+## 🌟 Tests
 
 The service only contains integration tests so far, run below:
 
@@ -124,12 +112,8 @@ The service only contains integration tests so far, run below:
 make tests
 ```
 
-### Update Mocks
+## 🌟 Update Mocks
 
 1. Make sure the interfaces such as the `DBClient`is up to date
 2. Install `mockery`: https://vektra.github.io/mockery/latest/
 3. Run `make generate-mock-interface`
-
-## Contribution
-
-Feel free to submit a pull request or open an issue.
