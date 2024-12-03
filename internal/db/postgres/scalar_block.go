@@ -26,3 +26,36 @@ func (db *DbAdapter) SearchBlocks(ctx context.Context, payload *types.SearchBloc
 		Find(&blocks)
 	return blocks, nil
 }
+
+func (db *DbAdapter) GetBlocksByHeight(ctx context.Context, height string) (*models.Block, *types.Error) {
+	var block *models.Block
+	db.XchainsIndexerClient.WithContext(ctx).Where("height = ?", height).First(&block)
+	return block, nil
+}
+
+func (db *DbAdapter) GetEventsByBlockID(ctx context.Context, blockID uint) ([]*models.BlockEvent, *types.Error) {
+	var events []*models.BlockEvent
+	db.XchainsIndexerClient.WithContext(ctx).
+		Preload("BlockEventType").
+		Where("block_id = ?", blockID).
+		Find(&events)
+	return events, nil
+}
+
+func (db *DbAdapter) GetEventsAttributesByEventIDs(ctx context.Context, eventIDs []uint) ([]*models.BlockEventAttribute, *types.Error) {
+	var eventsAttributes []*models.BlockEventAttribute
+	db.XchainsIndexerClient.WithContext(ctx).
+		Preload("BlockEventAttributeKey").
+		Where("block_event_id IN (?)", eventIDs).
+		Find(&eventsAttributes)
+	return eventsAttributes, nil
+}
+
+func (db *DbAdapter) GetEventsAttributesByEventID(ctx context.Context, eventID uint) ([]*models.BlockEventAttribute, *types.Error) {
+	var eventsAttributes []*models.BlockEventAttribute
+	db.XchainsIndexerClient.WithContext(ctx).
+		Preload("BlockEventAttributeKey").
+		Where("block_event_id = ?", eventID).
+		Find(&eventsAttributes)
+	return eventsAttributes, nil
+}
