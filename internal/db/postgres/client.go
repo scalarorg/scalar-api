@@ -36,3 +36,19 @@ func New(ctx context.Context, cfg config.PostgresDBConfig) (*PostgresClient, err
 		cfg:    cfg,
 	}, err
 }
+
+func NewPostgresDbClient(cfg config.PostgresDBConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s sslmode=disable", cfg.Host, cfg.Port, cfg.DbName, cfg.User, cfg.Password)
+	gormLogLevel := logger.Silent
+
+	switch cfg.LogLevel {
+	case "info":
+		gormLogLevel = logger.Info
+	}
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(gormLogLevel)})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}

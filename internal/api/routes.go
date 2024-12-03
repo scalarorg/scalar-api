@@ -20,6 +20,7 @@ func (a *Server) SetupRoutes(r *chi.Mux) {
 	registerGmpHandler(r, handlers)
 	registerVaultHandler(r, handlers)
 	registerCustodialHandler(r, handlers)
+	registerValidatorHandler(r, handlers)
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 }
@@ -61,4 +62,8 @@ func registerCustodialHandler(r *chi.Mux, handlers *handlers.Handler) {
 	r.Get("/v1/custodial/groups", registerHandler(handlers.GetCustodialGroups))
 	r.Get("/v1/custodial/groups/shorten", registerHandler(handlers.GetShortenCustodialGroups))
 	r.Get("/v1/custodial/group/{name}", registerHandler(handlers.GetCustodialGroupByName))
+}
+
+func registerValidatorHandler(r *chi.Mux, handlers *handlers.Handler) {
+	r.Post("/v1/validator/searchBlocks", registerHandler(handlers.SearchBlocks))
 }
