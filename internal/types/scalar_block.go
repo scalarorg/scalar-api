@@ -6,13 +6,12 @@ type SearchBlocksRequestPayload struct {
 }
 
 type SearchBlockResponsePayload struct {
-	ID                    uint   `json:"id"`
-	Time                  uint64 `json:"time"`
-	Height                uint64 `json:"height"`
-	ChainID               uint   `json:"chain_id"`
-	ProposerConsAddressID uint   `json:"proposer_cons_address_id"`
-	TxIndexed             bool   `json:"tx_indexed"`
-	BlockEventsIndexed    bool   `json:"block_events_indexed"`
+	ID              uint   `json:"id"`
+	Hash            string `json:"hash"`
+	Time            uint64 `json:"time"`
+	Height          uint64 `json:"height"`
+	ProposerAddress string `json:"proposer_address"`
+	NumTxs          int    `json:"num_txs"`
 }
 
 type Attribute struct {
@@ -26,7 +25,11 @@ type BlockEvent struct {
 }
 
 type SearchBlockByHeightRequestPayload struct {
-	Height          string     `json:"height"`
+	Height           string       `json:"height"`
+	Hash             string       `json:"hash"`
+	ProposerAddress  string       `json:"proposer_address"`
+	Time             uint64       `json:"time"`
+	NumTxs           int          `json:"num_txs"`
 	BeginBlockEvents []BlockEvent `json:"begin_block_events"`
 	EndBlockEvents   []BlockEvent `json:"end_block_events"`
 }

@@ -11,7 +11,7 @@ const (
 	recentBlocksLimit = 100
 )
 
-func (db *DbAdapter) SearchBlocks(ctx context.Context, payload *types.SearchBlocksRequestPayload) ([]*models.Block, *types.Error) {
+func (db *DbAdapter) SearchBlocks(ctx context.Context, payload *types.SearchBlocksRequestPayload) ([]*models.Block, error) {
 	var size int
 	if payload != nil && payload.Size != 0 {
 		size = payload.Size
@@ -22,18 +22,22 @@ func (db *DbAdapter) SearchBlocks(ctx context.Context, payload *types.SearchBloc
 	var blocks []*models.Block
 	db.XchainsIndexerClient.WithContext(ctx).
 		Order("height DESC").
+		Preload("ProposerConsAddress").
 		Limit(size).
 		Find(&blocks)
 	return blocks, nil
 }
 
-func (db *DbAdapter) GetBlocksByHeight(ctx context.Context, height string) (*models.Block, *types.Error) {
+func (db *DbAdapter) GetBlocksByHeight(ctx context.Context, height string) (*models.Block, error) {
 	var block *models.Block
-	db.XchainsIndexerClient.WithContext(ctx).Where("height = ?", height).First(&block)
+	db.XchainsIndexerClient.WithContext(ctx).
+		Preload("ProposerConsAddress").
+		Where("height = ?", height).
+		First(&block)
 	return block, nil
 }
 
-func (db *DbAdapter) GetEventsByBlockID(ctx context.Context, blockID uint) ([]*models.BlockEvent, *types.Error) {
+func (db *DbAdapter) GetEventsByBlockID(ctx context.Context, blockID uint) ([]*models.BlockEvent, error) {
 	var events []*models.BlockEvent
 	db.XchainsIndexerClient.WithContext(ctx).
 		Preload("BlockEventType").
@@ -42,7 +46,7 @@ func (db *DbAdapter) GetEventsByBlockID(ctx context.Context, blockID uint) ([]*m
 	return events, nil
 }
 
-func (db *DbAdapter) GetEventsAttributesByEventIDs(ctx context.Context, eventIDs []uint) ([]*models.BlockEventAttribute, *types.Error) {
+func (db *DbAdapter) GetEventsAttributesByEventIDs(ctx context.Context, eventIDs []uint) ([]*models.BlockEventAttribute, error) {
 	var eventsAttributes []*models.BlockEventAttribute
 	db.XchainsIndexerClient.WithContext(ctx).
 		Preload("BlockEventAttributeKey").
@@ -51,7 +55,7 @@ func (db *DbAdapter) GetEventsAttributesByEventIDs(ctx context.Context, eventIDs
 	return eventsAttributes, nil
 }
 
-func (db *DbAdapter) GetEventsAttributesByEventID(ctx context.Context, eventID uint) ([]*models.BlockEventAttribute, *types.Error) {
+func (db *DbAdapter) GetEventsAttributesByEventID(ctx context.Context, eventID uint) ([]*models.BlockEventAttribute, error) {
 	var eventsAttributes []*models.BlockEventAttribute
 	db.XchainsIndexerClient.WithContext(ctx).
 		Preload("BlockEventAttributeKey").

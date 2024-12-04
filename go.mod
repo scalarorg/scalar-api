@@ -12,6 +12,7 @@ require (
 	github.com/btcsuite/btcd/btcutil v1.1.6
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/scalarorg/xchains-indexer v0.0.0-20241205021823-db0507b3a4ad
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/viper v1.18.2
 	github.com/swaggo/swag v1.16.3
@@ -195,3 +196,5 @@ require (
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 replace github.com/scalarorg/bitcoin-vault/ffi/go-psbt => ../../bitcoin-vault/ffi/go-psbt
+
+// replace github.com/scalarorg/xchains-indexer => ../xchains-indexer

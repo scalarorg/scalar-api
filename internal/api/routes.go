@@ -67,4 +67,7 @@ func registerCustodialHandler(r *chi.Mux, handlers *handlers.Handler) {
 func registerValidatorHandler(r *chi.Mux, handlers *handlers.Handler) {
 	r.Post("/v1/validator/searchBlocks", registerHandler(handlers.SearchBlocks))
 	r.Post("/v1/validator/searchBlock/{height}", registerHandler(handlers.SearchBlockByHeight))
+	r.Post("/v1/validator/getTransactions", registerHandler(handlers.GetTransactions))
+	r.Post("/v1/validator/searchTransactions", registerHandler(handlers.SearchTransactions))
+	r.Post("/v1/validator/getTransaction/{hash}", registerHandler(handlers.GetTransactionByHash))
 }
