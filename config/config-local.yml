@@ -18,14 +18,14 @@ db:
   password: "postgres"
   log-level: "debug"
 
-queue:
-  queue_user: user # can be replaced by values in .env file
-  queue_password: password
-  url: "localhost:5672"
-  processing_timeout: 30
-  msg_max_retry_attempts: 3
-  requeue_delay_time: 60
-  queue_type: quorum
+xchains-indexer-db:
+  host: "localhost"
+  port: 5452
+  db-name: "xchains_indexer"
+  user: "postgres"
+  password: "postgres"
+  log-level: "debug"
+
 metrics:
   host: 0.0.0.0
   port: 2112

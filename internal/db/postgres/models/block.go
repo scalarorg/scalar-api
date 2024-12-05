@@ -1,21 +1,10 @@
 package models
 
 import (
-	"time"
+	indexer_models "github.com/scalarorg/xchains-indexer/db/models"
 )
 
-type Block struct {
-	ID                    uint
-	TimeStamp             time.Time
-	Height                int64 `gorm:"uniqueIndex:chainheight"`
-	ChainID               uint  `gorm:"uniqueIndex:chainheight"`
-	Chain                 Chain
-	ProposerConsAddress   Address
-	ProposerConsAddressID uint
-	TxIndexed             bool
-	// TODO: Should block event indexing be split out or rolled up?
-	BlockEventsIndexed bool
-}
+type Block = indexer_models.Block
 
 // Used to keep track of BeginBlock and EndBlock events
 type BlockLifecyclePosition int

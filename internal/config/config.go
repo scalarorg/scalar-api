@@ -11,9 +11,10 @@ import (
 type Config struct {
 	Server ServerConfig `mapstructure:"server"`
 	// TODO: Refactor db config
-	ScalarDb  PostgresDBConfig `mapstructure:"db"`
-	Metrics   MetricsConfig    `mapstructure:"metrics"`
-	InitDApps InitDAppsConfig
+	ScalarDb         PostgresDBConfig `mapstructure:"db"`
+	XchainsIndexerDb PostgresDBConfig `mapstructure:"xchains-indexer-db"`
+	Metrics          MetricsConfig    `mapstructure:"metrics"`
+	InitDApps        InitDAppsConfig
 }
 
 func (cfg *Config) Validate() error {

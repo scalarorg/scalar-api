@@ -18,6 +18,7 @@ type Services struct {
 	GmpClient         gmp.GmpClient
 	VaultClient       vault.VaultClient
 	ScalarClient      postgres.ScalarClient
+	DbAdapter         *postgres.DbAdapter
 	cfg               *config.Config
 	params            *types.GlobalParams
 	finalityProviders []types.FinalityProviderDetails
@@ -38,16 +39,23 @@ func New(
 	vaultClient := vault.New(scalarPostgresClient)
 	scalarClient := postgres.NewScalarClient(scalarPostgresClient)
 
+	dbAdapter, err := postgres.NewDatabaseAdapter(cfg)
+	if err != nil {
+		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating database adapter")
+		return nil, err
+	}
+
 	// Init dApps
 	err = scalarClient.InitDApps(cfg.InitDApps)
 	if err != nil {
-		log.Ctx(ctx).Warn().Err(err).Msg("warning while initializing dApps")
+		log.Ctx(ctx).Warn().Err(err).Msg("warning while failed to initialize dApps")
 	}
 
 	return &Services{
 		GmpClient:         *gmpClient,
 		VaultClient:       *vaultClient,
 		ScalarClient:      *scalarClient,
+		DbAdapter:         dbAdapter,
 		cfg:               cfg,
 		params:            globalParams,
 		finalityProviders: finalityProviders,
