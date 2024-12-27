@@ -10,7 +10,7 @@ server:
   max-content-length: 4096
   health-check-interval: 300 # 5 minutes interval
 
-db:
+relayer-db:
   host: "localhost"
   port: 5432
   db-name: "relayer"
@@ -18,10 +18,10 @@ db:
   password: "postgres"
   log-level: "debug"
 
-xchains-indexer-db:
+indexer-db:
   host: "localhost"
   port: 5452
-  db-name: "xchains_indexer"
+  db-name: "relayer"
   user: "postgres"
   password: "postgres"
   log-level: "debug"

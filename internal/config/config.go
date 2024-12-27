@@ -11,10 +11,10 @@ import (
 type Config struct {
 	Server ServerConfig `mapstructure:"server"`
 	// TODO: Refactor db config
-	ScalarDb         PostgresDBConfig `mapstructure:"db"`
-	XchainsIndexerDb PostgresDBConfig `mapstructure:"xchains-indexer-db"`
-	Metrics          MetricsConfig    `mapstructure:"metrics"`
-	InitDApps        InitDAppsConfig
+	RelayerDb PostgresDBConfig `mapstructure:"relayer-db"`
+	IndexerDb PostgresDBConfig `mapstructure:"indexer-db"`
+	Metrics   MetricsConfig    `mapstructure:"metrics"`
+	InitDApps InitDAppsConfig
 }
 
 func (cfg *Config) Validate() error {
@@ -22,7 +22,7 @@ func (cfg *Config) Validate() error {
 		return err
 	}
 
-	if err := cfg.ScalarDb.Validate(); err != nil {
+	if err := cfg.RelayerDb.Validate(); err != nil {
 		return err
 	}
 

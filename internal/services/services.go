@@ -18,7 +18,7 @@ type Services struct {
 	GmpClient         gmp.GmpClient
 	VaultClient       vault.VaultClient
 	ScalarClient      postgres.ScalarClient
-	DbAdapter         *postgres.DbAdapter
+	IndexerAdapter    *postgres.DbAdapter
 	cfg               *config.Config
 	params            *types.GlobalParams
 	finalityProviders []types.FinalityProviderDetails
@@ -30,16 +30,16 @@ func New(
 	globalParams *types.GlobalParams,
 	finalityProviders []types.FinalityProviderDetails,
 ) (*Services, error) {
-	scalarPostgresClient, err := postgres.New(ctx, cfg.ScalarDb)
+	relayerPostgresClient, err := postgres.New(ctx, cfg.RelayerDb)
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating Scalar Postgres client")
 		return nil, err
 	}
-	gmpClient := gmp.New(scalarPostgresClient)
-	vaultClient := vault.New(scalarPostgresClient)
-	scalarClient := postgres.NewScalarClient(scalarPostgresClient)
+	gmpClient := gmp.New(relayerPostgresClient)
+	vaultClient := vault.New(relayerPostgresClient)
+	scalarClient := postgres.NewScalarClient(relayerPostgresClient)
 
-	dbAdapter, err := postgres.NewDatabaseAdapter(cfg)
+	indexerAdapter, err := postgres.NewDatabaseAdapter(cfg)
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating database adapter")
 		return nil, err
@@ -55,7 +55,7 @@ func New(
 		GmpClient:         *gmpClient,
 		VaultClient:       *vaultClient,
 		ScalarClient:      *scalarClient,
-		DbAdapter:         dbAdapter,
+		IndexerAdapter:    indexerAdapter,
 		cfg:               cfg,
 		params:            globalParams,
 		finalityProviders: finalityProviders,

@@ -9,7 +9,7 @@ import (
 
 func (s *Services) GetTransactions(ctx context.Context, payload *types.GetTransactionsRequestPayload) ([]*types.GetTransactionsResponsePayload, *types.Error) {
 	height := payload.Height
-	transactions, err := s.DbAdapter.GetTransactionsByBlockHeight(ctx, height)
+	transactions, err := s.IndexerAdapter.GetTransactionsByBlockHeight(ctx, height)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -23,7 +23,7 @@ func (s *Services) GetTransactions(ctx context.Context, payload *types.GetTransa
 }
 
 func (s *Services) GetTransactionByHash(ctx context.Context, hash string) (*types.GetTransactionByHashResponsePayload, *types.Error) {
-	transaction, err := s.DbAdapter.GetTransactionByHash(ctx, hash)
+	transaction, err := s.IndexerAdapter.GetTransactionByHash(ctx, hash)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -39,7 +39,7 @@ func (s *Services) GetTransactionByHash(ctx context.Context, hash string) (*type
 }
 
 func (s *Services) SearchTransactions(ctx context.Context, payload *types.SearchTransactionsRequestPayload) ([]*types.GetTransactionsResponsePayload, int, *types.Error) {
-	transactions, total, err := s.DbAdapter.SearchTransactions(ctx, payload)
+	transactions, total, err := s.IndexerAdapter.SearchTransactions(ctx, payload)
 	if err != nil {
 		return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}

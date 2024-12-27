@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Services) SearchBlocks(ctx context.Context, payload *types.SearchBlocksRequestPayload) ([]*types.SearchBlockResponsePayload, *types.Error) {
-	blocks, err := s.DbAdapter.SearchBlocks(ctx, payload)
+	blocks, err := s.IndexerAdapter.SearchBlocks(ctx, payload)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -22,7 +22,7 @@ func (s *Services) SearchBlocks(ctx context.Context, payload *types.SearchBlocks
 	for _, block := range blocks {
 		blockIDs = append(blockIDs, block.ID)
 	}
-	numTxs, err := s.DbAdapter.GetNumTxsByBlockIDs(ctx, blockIDs)
+	numTxs, err := s.IndexerAdapter.GetNumTxsByBlockIDs(ctx, blockIDs)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -43,19 +43,19 @@ func (s *Services) SearchBlocks(ctx context.Context, payload *types.SearchBlocks
 
 func (s *Services) SearchBlockByHeight(ctx context.Context, height string) (*types.SearchBlockByHeightRequestPayload, *types.Error) {
 	// Get the block from the database by height
-	blocksFromDb, err := s.DbAdapter.GetBlocksByHeight(ctx, height)
+	blocksFromDb, err := s.IndexerAdapter.GetBlocksByHeight(ctx, height)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
 
 	// Get the number of txs in the block
-	numTxs, err := s.DbAdapter.GetNumTxsByBlockIDs(ctx, []uint{blocksFromDb.ID})
+	numTxs, err := s.IndexerAdapter.GetNumTxsByBlockIDs(ctx, []uint{blocksFromDb.ID})
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
 
 	// Get the events from the database according to the block's ID
-	eventsFromDb, err := s.DbAdapter.GetEventsByBlockID(ctx, blocksFromDb.ID)
+	eventsFromDb, err := s.IndexerAdapter.GetEventsByBlockID(ctx, blocksFromDb.ID)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -65,7 +65,7 @@ func (s *Services) SearchBlockByHeight(ctx context.Context, height string) (*typ
 	for _, event := range eventsFromDb {
 		eventIDs = append(eventIDs, event.ID)
 	}
-	eventsAttributesFromDb, err := s.DbAdapter.GetEventsAttributesByEventIDs(ctx, eventIDs)
+	eventsAttributesFromDb, err := s.IndexerAdapter.GetEventsAttributesByEventIDs(ctx, eventIDs)
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}

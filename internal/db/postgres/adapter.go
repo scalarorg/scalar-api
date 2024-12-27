@@ -15,7 +15,7 @@ type DbAdapter struct {
 
 func NewDatabaseAdapter(config *config.Config) (*DbAdapter, error) {
 	if dbAdapter == nil {
-		db, err := NewPostgresDbClient(config.XchainsIndexerDb)
+		db, err := NewPostgresDbClient(config.IndexerDb)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create postgres client: %w", err)
 		}
