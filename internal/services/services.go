@@ -41,15 +41,16 @@ func New(
 
 	indexerAdapter, err := postgres.NewDatabaseAdapter(cfg)
 	if err != nil {
+		log.Debug().Err(err).Msg("Create indexer adapter with error")
 		log.Ctx(ctx).Fatal().Err(err).Msg("error while creating database adapter")
 		return nil, err
 	}
 
 	// Init dApps
-	err = scalarClient.InitDApps(cfg.InitDApps)
-	if err != nil {
-		log.Ctx(ctx).Warn().Err(err).Msg("warning while failed to initialize dApps")
-	}
+	// err = scalarClient.InitDApps(cfg.InitDApps)
+	// if err != nil {
+	// 	log.Ctx(ctx).Warn().Err(err).Msg("warning while failed to initialize dApps")
+	// }
 
 	return &Services{
 		GmpClient:         *gmpClient,
