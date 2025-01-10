@@ -1,4 +1,4 @@
-package model
+package models
 
 type TimeLockDocument struct {
 	StakingTxHashHex string `bson:"staking_tx_hash_hex"`

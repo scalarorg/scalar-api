@@ -1,35 +1,23 @@
-package vault
+package pg
 
 import (
 	"context"
 	"encoding/hex"
 	"strconv"
 
-	"github.com/scalarorg/xchains-api/internal/db/postgres"
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
-type VaultClient struct {
-	relayer *postgres.RelayerClient
-}
-
-func New(scalarPostgresClient *postgres.PostgresClient) *VaultClient {
-	return &VaultClient{
-		relayer: &postgres.RelayerClient{
-			PgClient: scalarPostgresClient,
-		},
-	}
-}
-
-func (c *VaultClient) Search(ctx context.Context, payload *types.VaultPayload) ([]*VaultDocument, error) {
-	options := &postgres.Options{}
+func (c *PostgresClient) Search(ctx context.Context, payload *types.VaultPayload) ([]*models.VaultDocument, error) {
+	options := &models.Options{}
 	if payload != nil {
 		if payload.StakerPubkey != "" {
 			options.StakerPubkey = payload.StakerPubkey
 		}
 	}
 
-	relayerData, err := c.relayer.GetExecutedVaultBonding(ctx, options)
+	relayerData, err := c.GetExecutedVaultBonding(ctx, options)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +25,8 @@ func (c *VaultClient) Search(ctx context.Context, payload *types.VaultPayload) (
 	return c.getVaultsByRelayData(relayerData)
 }
 
-func (c *VaultClient) getVaultsByRelayData(relayDatas []postgres.RelayData) ([]*VaultDocument, error) {
-	vaults := make([]*VaultDocument, 0, len(relayDatas))
+func (c *PostgresClient) getVaultsByRelayData(relayDatas []models.RelayData) ([]*models.VaultDocument, error) {
+	vaults := make([]*models.VaultDocument, 0, len(relayDatas))
 
 	// TODO: why loop here? query batching?
 	for _, relayData := range relayDatas {
@@ -52,12 +40,12 @@ func (c *VaultClient) getVaultsByRelayData(relayDatas []postgres.RelayData) ([]*
 
 }
 
-func (c *VaultClient) getVaultByRelayData(relayData *postgres.RelayData) (*VaultDocument, error) {
+func (c *PostgresClient) getVaultByRelayData(relayData *models.RelayData) (*models.VaultDocument, error) {
 	txHex := hex.EncodeToString(relayData.ContractCall.TxHex)
-	return &VaultDocument{
+	return &models.VaultDocument{
 		ID:                              relayData.ID,
 		Status:                          strconv.Itoa(int(relayData.Status.Int32)),
-		SimplifiedStatus:                string(postgres.ToReadableStatus(int(relayData.Status.Int32))),
+		SimplifiedStatus:                string(models.ToReadableStatus(int(relayData.Status.Int32))),
 		SourceChain:                     relayData.From.String,
 		DestinationChain:                relayData.To.String,
 		DestinationSmartContractAddress: relayData.ContractCall.ContractAddress.String,

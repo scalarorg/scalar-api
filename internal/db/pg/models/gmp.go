@@ -1,6 +1,6 @@
-package gmp
+package models
 
-type Tx struct {
+type GMPTx struct {
 	ID      uint `gorm:"primaryKey"`
 	Hash    string
 	BlockId uint
@@ -14,7 +14,7 @@ type TxMessage struct {
 	MessageID     uint `gorm:"uniqueIndex:txMessageIndex,priority:2"`
 	BlockId       uint
 	MessageDetail string
-	Tx            Tx `gorm:"foreignKey:TxID;references:ID"`
+	Tx            GMPTx `gorm:"foreignKey:TxID;references:ID"`
 }
 
 type CreatedAtDocument struct {
@@ -250,4 +250,15 @@ type GMPDocument struct {
 	GasStatus                             string                      `json:"gas_status,omitempty"`
 	IsTwoWay                              bool                        `json:"is_two_way,omitempty"`
 	CreatedAtDocument
+}
+
+type MapBlockEventAttributes map[string]string
+
+type Options struct {
+	Size         int
+	Offset       int
+	EventId      string
+	EventType    string
+	EventTypes   []string
+	StakerPubkey string
 }

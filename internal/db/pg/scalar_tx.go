@@ -1,9 +1,9 @@
-package postgres
+package pg
 
 import (
 	"context"
 
-	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -11,9 +11,9 @@ const (
 	searchTransactionsLimit = 100
 )
 
-func (db *DbAdapter) GetTransactionsByBlockHeight(ctx context.Context, height int64) ([]*models.Tx, error) {
+func (c *PostgresClient) GetTransactionsByBlockHeight(ctx context.Context, height int64) ([]*models.Tx, error) {
 	var blockId int64
-	err := db.XchainsIndexerClient.WithContext(ctx).
+	err := c.DB.WithContext(ctx).
 		Model(&models.Block{}).
 		Where("height = ?", height).
 		Select("id").
@@ -23,7 +23,7 @@ func (db *DbAdapter) GetTransactionsByBlockHeight(ctx context.Context, height in
 	}
 
 	var transactions []*models.Tx
-	err = db.XchainsIndexerClient.WithContext(ctx).
+	err = c.DB.WithContext(ctx).
 		Model(&models.Tx{}).
 		Where("block_id = ?", blockId).
 		Find(&transactions).Error
@@ -33,16 +33,16 @@ func (db *DbAdapter) GetTransactionsByBlockHeight(ctx context.Context, height in
 	return transactions, nil
 }
 
-func (db *DbAdapter) GetTransactionByHash(ctx context.Context, hash string) (*models.Tx, error) {
+func (c *PostgresClient) GetTransactionByHash(ctx context.Context, hash string) (*models.Tx, error) {
 	var transaction models.Tx
-	err := db.XchainsIndexerClient.WithContext(ctx).
+	err := c.DB.WithContext(ctx).
 		Where("hash = ?", hash).
 		Preload("Block").
 		First(&transaction).Error
 	return &transaction, err
 }
 
-func (db *DbAdapter) SearchTransactions(ctx context.Context, payload *types.SearchTransactionsRequestPayload) ([]*models.Tx, int, error) {
+func (c *PostgresClient) SearchTransactions(ctx context.Context, payload *types.SearchTransactionsRequestPayload) ([]*models.Tx, int, error) {
 	var size int
 	if payload != nil && payload.Size != 0 {
 		size = payload.Size
@@ -54,12 +54,12 @@ func (db *DbAdapter) SearchTransactions(ctx context.Context, payload *types.Sear
 	var total int64
 
 	// Count total rows
-	if err := db.XchainsIndexerClient.WithContext(ctx).Model(&models.Tx{}).Count(&total).Error; err != nil {
+	if err := c.DB.WithContext(ctx).Model(&models.Tx{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	// Query transactions with ordering by block height
-	err := db.XchainsIndexerClient.WithContext(ctx).
+	err := c.DB.WithContext(ctx).
 		Model(&models.Tx{}).
 		Preload("Block").
 		Joins("JOIN blocks ON txes.block_id = blocks.id").
@@ -73,11 +73,11 @@ func (db *DbAdapter) SearchTransactions(ctx context.Context, payload *types.Sear
 	return transactions, int(total), nil
 }
 
-func (db *DbAdapter) GetNumTxsByBlockIDs(ctx context.Context, blockIDs []uint) (map[uint]int, error) {
+func (c *PostgresClient) GetNumTxsByBlockIDs(ctx context.Context, blockIDs []uint) (map[uint]int, error) {
 	numTxs := make(map[uint]int)
 	for _, blockID := range blockIDs {
 		var count int64
-		if err := db.XchainsIndexerClient.WithContext(ctx).Model(&models.Tx{}).Where("block_id = ?", blockID).Count(&count).Error; err != nil {
+		if err := c.DB.WithContext(ctx).Model(&models.Tx{}).Where("block_id = ?", blockID).Count(&count).Error; err != nil {
 			return nil, err
 		}
 		numTxs[blockID] = int(count)

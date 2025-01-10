@@ -12,7 +12,6 @@ type Config struct {
 	Server ServerConfig `mapstructure:"server"`
 	// TODO: Refactor db config
 	RelayerDb PostgresDBConfig `mapstructure:"relayer-db"`
-	IndexerDb PostgresDBConfig `mapstructure:"indexer-db"`
 	Metrics   MetricsConfig    `mapstructure:"metrics"`
 	InitDApps InitDAppsConfig
 }

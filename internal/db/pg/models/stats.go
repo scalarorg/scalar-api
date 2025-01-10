@@ -1,4 +1,4 @@
-package model
+package models
 
 // StatsLockDocument represents the document in the stats lock collection
 // It's used as a lock to prevent concurrent stats calculation for the same staking tx hash

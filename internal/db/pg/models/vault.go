@@ -1,4 +1,4 @@
-package vault
+package models
 
 type VaultDocument struct {
 	ID                              string `json:"id,omitempty"`
