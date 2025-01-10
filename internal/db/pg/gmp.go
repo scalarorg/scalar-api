@@ -1,4 +1,4 @@
-package gmp
+package pg
 
 import (
 	"context"
@@ -6,8 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/scalarorg/xchains-api/internal/db/postgres"
-	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -21,28 +20,12 @@ const (
 	EVENT_TYPE_XCHAINS_CONFIRM          string = "xchains.confirm"
 )
 
-// TODO: refactor db client
-type GmpClient struct {
-	indexer *postgres.IndexerClient
-	relayer *postgres.RelayerClient
-}
-
-func New(scalarPostgresClient *postgres.PostgresClient) *GmpClient {
-	return &GmpClient{
-		indexer: &postgres.IndexerClient{
-			PgClient: scalarPostgresClient,
-		},
-		relayer: &postgres.RelayerClient{
-			PgClient: scalarPostgresClient,
-		},
-	}
-}
 func normalizeEventType(eventType string) string {
 	parts := strings.Split(eventType, ".")
 	return parts[len(parts)-1]
 }
-func (c *GmpClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([]*GMPDocument, int, *types.Error) {
-	options := &postgres.Options{}
+func (c *PostgresClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([]*models.GMPDocument, int, *types.Error) {
+	options := &models.Options{}
 	if payload != nil {
 		options.Size = payload.Size
 		options.Offset = payload.From
@@ -57,7 +40,7 @@ func (c *GmpClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([
 		}
 	}
 
-	relayDatas, total, err := c.relayer.GetRelayerDatas(ctx, options)
+	relayDatas, total, err := c.GetRelayerDatas(ctx, options)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -68,9 +51,9 @@ func (c *GmpClient) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([
 	}
 	return result, total, nil
 }
-func (c *GmpClient) getGMPByMessageID(ctx context.Context, messageID string, options *postgres.Options) ([]*GMPDocument, int, *types.Error) {
+func (c *PostgresClient) getGMPByMessageID(ctx context.Context, messageID string, options *models.Options) ([]*models.GMPDocument, int, *types.Error) {
 	options.EventId = messageID
-	relayDatas, total, err := c.relayer.GetRelayerDatas(ctx, options)
+	relayDatas, total, err := c.GetRelayerDatas(ctx, options)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -80,8 +63,8 @@ func (c *GmpClient) getGMPByMessageID(ctx context.Context, messageID string, opt
 	}
 	return result, total, nil
 }
-func (c *GmpClient) getGMPByTxHash(ctx context.Context, txHash string, options *postgres.Options) ([]*GMPDocument, int, *types.Error) {
-	relayDatas, total, err := c.relayer.GetRelayerDatas(ctx, options)
+func (c *PostgresClient) getGMPByTxHash(ctx context.Context, txHash string, options *models.Options) ([]*models.GMPDocument, int, *types.Error) {
+	relayDatas, total, err := c.GetRelayerDatas(ctx, options)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -92,7 +75,7 @@ func (c *GmpClient) getGMPByTxHash(ctx context.Context, txHash string, options *
 	return result, total, nil
 }
 
-func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgres.RelayData) ([]*GMPDocument, *types.Error) {
+func (c *PostgresClient) getGMPByRelayDatas(ctx context.Context, relayDatas []models.RelayData) ([]*models.GMPDocument, *types.Error) {
 	messageIds := make([]string, len(relayDatas))
 	for index, event := range relayDatas {
 		messageIds[index] = event.ID
@@ -108,11 +91,11 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 	// }
 	// eventAttributes, err := c.indexer.FindEventAttributes(ctx, eventIds)
 	// fmt.Printf("EventAttributes %v", eventAttributes)
-	mapGmps := make(map[string]*GMPDocument)
-	mapRelayDatas := make(map[string]postgres.RelayData)
-	gmps := make([]*GMPDocument, len(relayDatas))
+	mapGmps := make(map[string]*models.GMPDocument)
+	mapRelayDatas := make(map[string]models.RelayData)
+	gmps := make([]*models.GMPDocument, len(relayDatas))
 	for index, relayData := range relayDatas {
-		gmps[index] = &GMPDocument{
+		gmps[index] = &models.GMPDocument{
 			ID: relayData.ID,
 			// From:   relayData.From,
 			// To:     relayData.To,
@@ -120,7 +103,7 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 			// CreatedAt: relayData.CreatedAt,
 			// UpdatedAt: relayData.UpdatedAt,
 			Status:           strconv.Itoa(int(relayData.Status.Int32)),
-			SimplifiedStatus: string(postgres.ToReadableStatus(int(relayData.Status.Int32))),
+			SimplifiedStatus: string(models.ToReadableStatus(int(relayData.Status.Int32))),
 		}
 		createContractCall(gmps[index], &relayData)
 		createContractCallApproved(gmps[index], &relayData)
@@ -160,7 +143,7 @@ func (c *GmpClient) getGMPByRelayDatas(ctx context.Context, relayDatas []postgre
 	return gmps, nil
 }
 
-func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
+func createContractCall(gmp *models.GMPDocument, relayData *models.RelayData) {
 	from := relayData.ContractCall.SenderAddress.String
 	// Nov 11, Taivv: SenderAddress is stored using electrum indexer, get from first txin.script_pubkey
 	// if relayData.ContractCall.StakerPublicKey.String != "" {
@@ -174,16 +157,16 @@ func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
 	// 	from = relayData.ContractCall.SenderAddress.String
 	// }
 
-	call := GMPStepDocument{
+	call := models.GMPStepDocument{
 		ID:              relayData.ID,
 		Chain:           relayData.From.String,
 		Event:           normalizeEventType(EVENT_TYPE_CONTRACT_CALL),
 		ContractAddress: relayData.ContractCall.ContractAddress.String,
-		Transaction: TransactionDocument{
+		Transaction: models.TransactionDocument{
 			Hash: relayData.ContractCall.TxHash.String,
 			From: from,
 		},
-		ReturnValues: ReturnValuesDocument{
+		ReturnValues: models.ReturnValuesDocument{
 			DestinationChain: relayData.To.String,
 		},
 		BlockNumber:     uint64(relayData.ContractCall.BlockNumber.Int32),
@@ -219,8 +202,8 @@ func createContractCall(gmp *GMPDocument, relayData *postgres.RelayData) {
 	// fmt.Printf("Call chain %s\n", call.Chain)
 }
 
-func createContractCallApproved(gmp *GMPDocument, relayData *postgres.RelayData) {
-	approved := GMPStepDocument{
+func createContractCallApproved(gmp *models.GMPDocument, relayData *models.RelayData) {
+	approved := models.GMPStepDocument{
 		//Todo: Fetch blockhash/Number/Timestamp?
 		BlockHash: "",
 		// BlockTimestamp: 0,
@@ -251,7 +234,8 @@ func createContractCallApproved(gmp *GMPDocument, relayData *postgres.RelayData)
 	}
 	gmp.Approved = approved
 }
-func createGMPDocument(gmp *GMPDocument, relayData *postgres.RelayData, event *models.BlockEvent, attribute postgres.MapBlockEventAttributes) {
+
+func createGMPDocument(gmp *models.GMPDocument, relayData *models.RelayData, event *models.BlockEvent, attribute models.MapBlockEventAttributes) {
 	gmp.ID = parseAttributeValue(attribute["event_id"]).(string)
 	gmp.CommandID = parseAttributeValue(attribute["command_id"]).(string)
 	// fmt.Printf("Event id %s\n", attribute["event_id"])
@@ -265,9 +249,9 @@ func createGMPDocument(gmp *GMPDocument, relayData *postgres.RelayData, event *m
 	// gmp.Executed = createExecuted(event, attribute)
 }
 
-func createConfirmEvent(event *models.BlockEvent, attribute postgres.MapBlockEventAttributes) ConfirmDocument {
+func createConfirmEvent(event *models.BlockEvent, attribute models.MapBlockEventAttributes) models.ConfirmDocument {
 	// eventId := parseAttributeValue(attribute["event_id"]).(string)
-	confirm := ConfirmDocument{
+	confirm := models.ConfirmDocument{
 		SourceChain:           "",
 		PollId:                "",
 		BlockNumber:           0,
@@ -281,12 +265,12 @@ func createConfirmEvent(event *models.BlockEvent, attribute postgres.MapBlockEve
 }
 
 // Load data from event ContractCallApproved
-func createApprovedEvent(relayData *postgres.RelayData, event *models.BlockEvent, attribute postgres.MapBlockEventAttributes) GMPStepDocument {
+func createApprovedEvent(relayData *models.RelayData, event *models.BlockEvent, attribute models.MapBlockEventAttributes) models.GMPStepDocument {
 	eventId := parseAttributeValue(attribute["event_id"]).(string)
 	//Todo fill address and contract address
 	address := ""
 	contractAddress := "" // The same as address
-	approved := GMPStepDocument{
+	approved := models.GMPStepDocument{
 		//Todo: TxHash_TransactionIndex_logIndex
 		ID: eventId,
 		//Todo: Fetch blockhash/Number/Timestamp?
@@ -301,30 +285,30 @@ func createApprovedEvent(relayData *postgres.RelayData, event *models.BlockEvent
 		ContractAddress: contractAddress,
 		//Todo: Fill TransactionHash
 		TransactionHash: "",
-		ReturnValues: ReturnValuesDocument{
+		ReturnValues: models.ReturnValuesDocument{
 			SourceChain:     parseAttributeValue(attribute["chain"]).(string),
 			SourceAddress:   parseAttributeValue(attribute["sender"]).(string),
 			PayloadHash:     parseAttributeValue(attribute["payload_hash"]).(string),
 			ContractAddress: parseAttributeValue(attribute["contract_address"]).(string),
 			CommandID:       parseAttributeValue(attribute["command_id"]).(string),
 		},
-		Transaction: TransactionDocument{},
+		Transaction: models.TransactionDocument{},
 	}
 	return approved
 }
 
 // Load data from event executed
-func createExecuted(event *models.BlockEvent, attribute postgres.MapBlockEventAttributes) GMPStepDocument {
+func createExecuted(event *models.BlockEvent, attribute models.MapBlockEventAttributes) models.GMPStepDocument {
 	eventId := parseAttributeValue(attribute["event_id"]).(string)
 	executedChain := "" //Chain where message is executed
-	executed := GMPStepDocument{
+	executed := models.GMPStepDocument{
 		ID:              eventId,
 		Chain:           executedChain,
 		SourceChain:     parseAttributeValue(attribute["source_chain"]).(string),
 		ContractAddress: parseAttributeValue(attribute["contract_address"]).(string),
 		Event:           normalizeEventType(event.BlockEventType.Type),
 		TransactionHash: eventId,
-		ReturnValues: ReturnValuesDocument{
+		ReturnValues: models.ReturnValuesDocument{
 			DestinationChain: parseAttributeValue(attribute["destination_chain"]).(string),
 			PayloadHash:      parseAttributeValue(attribute["payload_hash"]).(string),
 			Sender:           parseAttributeValue(attribute["sender"]).(string),

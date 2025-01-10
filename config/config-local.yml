@@ -11,20 +11,13 @@ server:
   health-check-interval: 300 # 5 minutes interval
 
 relayer-db:
-  host: "localhost"
+  host: "192.168.1.21"
   port: 5432
   db-name: "relayer"
   user: "postgres"
   password: "postgres"
   log-level: "debug"
 
-indexer-db:
-  host: "localhost"
-  port: 5452
-  db-name: "relayer"
-  user: "postgres"
-  password: "postgres"
-  log-level: "debug"
 
 metrics:
   host: 0.0.0.0

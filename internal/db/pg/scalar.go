@@ -1,4 +1,4 @@
-package postgres
+package pg
 
 import (
 	"encoding/json"
@@ -7,20 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/scalarorg/xchains-api/internal/config"
-	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 )
 
-type ScalarClient struct {
-	scalarPostgresClient *PostgresClient
-}
-
-func NewScalarClient(scalarPostgresClient *PostgresClient) *ScalarClient {
-	return &ScalarClient{
-		scalarPostgresClient: scalarPostgresClient,
-	}
-}
-
-func (s *ScalarClient) InitDApps(cfg config.InitDAppsConfig) error {
+func (s *PostgresClient) InitDApps(cfg config.InitDAppsConfig) error {
 	// Check config chains path and runtime chains path
 	if cfg.ConfigChainsPath == "" || cfg.RuntimeChainsPath == "" {
 		return fmt.Errorf("config chains path or runtime chains path is not set")
@@ -80,28 +70,27 @@ func (s *ScalarClient) InitDApps(cfg config.InitDAppsConfig) error {
 	return nil
 }
 
-func (s *ScalarClient) GetDApps() ([]*models.DApp, error) {
+func (s *PostgresClient) GetDApps() ([]*models.DApp, error) {
 	var dApps []*models.DApp
-	if err := s.scalarPostgresClient.Db.Preload("CustodialGroup").Preload("CustodialGroup.Custodials").Find(&dApps).Error; err != nil {
+	if err := s.DB.Preload("CustodialGroup").Preload("CustodialGroup.Custodials").Find(&dApps).Error; err != nil {
 		return nil, err
 	}
 	return dApps, nil
 }
 
-func (s *ScalarClient) SaveDApp(dApp *models.DApp) error {
-	dApps := s.scalarPostgresClient.Db
-	return dApps.Create(dApp).Error
+func (s *PostgresClient) SaveDApp(dApp *models.DApp) error {
+	return s.DB.Create(dApp).Error
 }
 
-func (s *ScalarClient) UpdateDApp(dApp *models.DApp) error {
+func (s *PostgresClient) UpdateDApp(dApp *models.DApp) error {
 	// First find the existing DApp
 	existingDApp := &models.DApp{}
-	if err := s.scalarPostgresClient.Db.First(existingDApp, dApp.ID).Error; err != nil {
+	if err := s.DB.First(existingDApp, dApp.ID).Error; err != nil {
 		return err
 	}
 
 	// Update the DApp with all fields including associations
-	result := s.scalarPostgresClient.Db.Model(existingDApp).
+	result := s.DB.Model(existingDApp).
 		Updates(map[string]interface{}{
 			"chain_name":             dApp.ChainName,
 			"btc_address_hex":        dApp.BTCAddressHex,
@@ -120,24 +109,22 @@ func (s *ScalarClient) UpdateDApp(dApp *models.DApp) error {
 	}
 
 	// Update the CustodialGroup association
-	if err := s.scalarPostgresClient.Db.Model(existingDApp).Association("CustodialGroup").Replace(dApp.CustodialGroup); err != nil {
+	if err := s.DB.Model(existingDApp).Association("CustodialGroup").Replace(dApp.CustodialGroup); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *ScalarClient) ToggleDApp(ID string) error {
-	dApps := s.scalarPostgresClient.Db
+func (s *PostgresClient) ToggleDApp(ID string) error {
 	var result models.DApp
-	if err := dApps.Where("id = ?", ID).First(&result).Error; err != nil {
+	if err := s.DB.Where("id = ?", ID).First(&result).Error; err != nil {
 		return err
 	}
 	result.State = !result.State
-	return dApps.Save(&result).Error
+	return s.DB.Save(&result).Error
 }
 
-func (s *ScalarClient) DeleteDApp(ID string) error {
-	dApps := s.scalarPostgresClient.Db
-	return dApps.Where("id = ?", ID).Delete(&models.DApp{}).Error
+func (s *PostgresClient) DeleteDApp(ID string) error {
+	return s.DB.Where("id = ?", ID).Delete(&models.DApp{}).Error
 }

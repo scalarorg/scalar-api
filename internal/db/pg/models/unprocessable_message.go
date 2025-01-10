@@ -1,4 +1,4 @@
-package model
+package models
 
 type UnprocessableMessageDocument struct {
 	MessageBody string `bson:"message_body"`

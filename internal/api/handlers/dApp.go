@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/services"
 	"github.com/scalarorg/xchains-api/internal/types"
 )

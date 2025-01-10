@@ -1,4 +1,4 @@
-package postgres
+package pg
 
 import (
 	"context"
@@ -7,12 +7,9 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog/log"
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
-
-type RelayerClient struct {
-	PgClient *PostgresClient
-}
 
 const QUERY_RELAYDATA = `
 SELECT 
@@ -74,8 +71,8 @@ const QUERY_RELAYDATA_COUNT = `SELECT COUNT(*) FROM "relay_data" rd`
 //     FROM "call_contract_with_tokens" ct
 // ) ct ON rd.id = ct.id AND ct.rn = 1`
 
-func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) ([]RelayData, int, *types.Error) {
-	var relayDatas []RelayData
+func (c *PostgresClient) GetRelayerDatas(ctx context.Context, options *models.Options) ([]models.RelayData, int, *types.Error) {
+	var relayDatas []models.RelayData
 	var totalCount int
 
 	if options.Size <= 0 {
@@ -87,7 +84,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 
 	// Only perform count query when not searching by ID
 	if options.EventId == "" {
-		err := c.PgClient.Db.Raw(QUERY_RELAYDATA_COUNT).Scan(&totalCount).Error
+		err := c.DB.Raw(QUERY_RELAYDATA_COUNT).Scan(&totalCount).Error
 		if err != nil {
 			return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 		}
@@ -104,9 +101,9 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	var rows *sql.Rows
 	var err error
 	if options.EventId != "" {
-		rows, err = c.PgClient.Db.Raw(query, options.EventId).Rows()
+		rows, err = c.DB.Raw(query, options.EventId).Rows()
 	} else {
-		rows, err = c.PgClient.Db.Raw(query).Rows()
+		rows, err = c.DB.Raw(query).Rows()
 	}
 	log.Ctx(ctx).Debug().Msg(fmt.Sprintf("Query: %+v", err))
 	if err != nil {
@@ -114,9 +111,9 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	}
 	defer rows.Close()
 	for rows.Next() {
-		relayData := RelayData{
-			ContractCall: ContractCall{
-				ContractCallApproved: ContractCallApproved{},
+		relayData := models.RelayData{
+			ContractCall: models.ContractCall{
+				ContractCallApproved: models.ContractCallApproved{},
 			},
 			//ContractCallWithToken: ContractCallWithToken{},
 		}
@@ -179,7 +176,7 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 	return relayDatas, totalCount, nil
 }
 
-// func (c *RelayerClient) GetRelayerDatas0(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
+// func (c *PostgresClient)GetRelayerDatas0(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
 // 	var relayDatas []RelayData
 // 	if options.Size <= 0 {
 // 		options.Size = 10
@@ -195,10 +192,10 @@ func (c *RelayerClient) GetRelayerDatas(ctx context.Context, options *Options) (
 // 	return relayDatas, nil
 // }
 
-func (c *RelayerClient) GetContractCallParams(ctx context.Context, messageIds []string) (map[string]ContractCall, *types.Error) {
-	mapContractCalls := make(map[string]ContractCall)
-	var contractCalls []ContractCall
-	result := c.PgClient.Db.Where("id IN ?", messageIds).Find(&contractCalls)
+func (c *PostgresClient) GetContractCallParams(ctx context.Context, messageIds []string) (map[string]models.ContractCall, *types.Error) {
+	mapContractCalls := make(map[string]models.ContractCall)
+	var contractCalls []models.ContractCall
+	result := c.DB.Where("id IN ?", messageIds).Find(&contractCalls)
 	if result.Error != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, result.Error)
 	}
@@ -244,8 +241,8 @@ LEFT JOIN (
      FROM "command_executeds" ce
 ) ce ON ce_ref_tx_hash = c_tx_hash WHERE rd."status" = 2`
 
-func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Options) ([]RelayData, *types.Error) {
-	var relayDatas []RelayData
+func (c *PostgresClient) GetExecutedVaultBonding(ctx context.Context, options *models.Options) ([]models.RelayData, *types.Error) {
+	var relayDatas []models.RelayData
 	if options.Size <= 0 {
 		options.Size = 10
 	}
@@ -262,18 +259,18 @@ func (c *RelayerClient) GetExecutedVaultBonding(ctx context.Context, options *Op
 	var rows *sql.Rows
 	var err error
 	if options.StakerPubkey != "" {
-		rows, err = c.PgClient.Db.Raw(query, options.StakerPubkey).Rows()
+		rows, err = c.DB.Raw(query, options.StakerPubkey).Rows()
 	} else {
-		rows, err = c.PgClient.Db.Raw(query).Rows()
+		rows, err = c.DB.Raw(query).Rows()
 	}
 	if err != nil {
 		return relayDatas, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		relayData := RelayData{
-			ContractCall: ContractCall{
-				ContractCallApproved: ContractCallApproved{},
+		relayData := models.RelayData{
+			ContractCall: models.ContractCall{
+				ContractCallApproved: models.ContractCallApproved{},
 			},
 			//ContractCallWithToken: ContractCallWithToken{},
 		}

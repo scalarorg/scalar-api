@@ -1,4 +1,4 @@
-package model
+package models
 
 import (
 	"github.com/scalarorg/xchains-api/internal/types"

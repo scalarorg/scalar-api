@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/scalarorg/xchains-api/internal/db/postgres/models"
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
@@ -23,7 +23,7 @@ type DAppServiceParams struct {
 }
 
 func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
-	err := s.ScalarClient.SaveDApp(&models.DApp{
+	err := s.Pg.SaveDApp(&models.DApp{
 		ChainName:            params.ChainName,
 		BTCAddressHex:        params.BtcAddressHex,
 		PublicKeyHex:         params.PublicKeyHex,
@@ -43,7 +43,7 @@ func (s *Services) CreateDApp(ctx context.Context, params DAppServiceParams) *ty
 }
 
 func (s *Services) GetDApp(ctx context.Context) ([]*models.DApp, *types.Error) {
-	dApps, err := s.ScalarClient.GetDApps()
+	dApps, err := s.Pg.GetDApps()
 	if err != nil {
 		return nil, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -52,7 +52,7 @@ func (s *Services) GetDApp(ctx context.Context) ([]*models.DApp, *types.Error) {
 
 func (s *Services) UpdateDApp(ctx context.Context, params DAppServiceParams) *types.Error {
 
-	err := s.ScalarClient.UpdateDApp(&models.DApp{
+	err := s.Pg.UpdateDApp(&models.DApp{
 		ID:                   params.ID,
 		ChainName:            params.ChainName,
 		BTCAddressHex:        params.BtcAddressHex,
@@ -73,7 +73,7 @@ func (s *Services) UpdateDApp(ctx context.Context, params DAppServiceParams) *ty
 }
 
 func (s *Services) ToggleDApp(ctx context.Context, ID string) *types.Error {
-	err := s.ScalarClient.ToggleDApp(ID)
+	err := s.Pg.ToggleDApp(ID)
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
@@ -81,7 +81,7 @@ func (s *Services) ToggleDApp(ctx context.Context, ID string) *types.Error {
 }
 
 func (s *Services) DeleteDApp(ctx context.Context, ID string) *types.Error {
-	err := s.ScalarClient.DeleteDApp(ID)
+	err := s.Pg.DeleteDApp(ID)
 	if err != nil {
 		return types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}
