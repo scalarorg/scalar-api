@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/zerolog"
@@ -29,6 +31,15 @@ func New(
 		log.Fatal().Err(err).Msg("error while parsing log level")
 	}
 	zerolog.SetGlobalLevel(logLevel)
+
+	output := zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: time.DateTime,
+		NoColor:    false,
+	}
+
+	// Set global logger
+	log.Logger = log.Output(output)
 
 	r.Use(middlewares.CorsMiddleware(cfg))
 	r.Use(middlewares.SecurityHeadersMiddleware())

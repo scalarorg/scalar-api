@@ -1,8 +1,6 @@
 module github.com/scalarorg/xchains-api
 
-go 1.23
-
-toolchain go1.23.2
+go 1.23.3
 
 require (
 	github.com/babylonchain/babylon v0.9.0-rc.1
@@ -12,13 +10,14 @@ require (
 	github.com/btcsuite/btcd/btcutil v1.1.6
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/scalarorg/data-models v0.0.0-20250110082742-2450fb11dfb5
 	github.com/scalarorg/xchains-indexer v0.0.0-20241205021823-db0507b3a4ad
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/viper v1.18.2
 	github.com/swaggo/swag v1.16.3
 	github.com/unrolled/secure v1.14.0
 	gorm.io/driver/postgres v1.5.9
-	gorm.io/gorm v1.25.11
+	gorm.io/gorm v1.25.12
 )
 
 require (

@@ -15,6 +15,7 @@ func (a *Server) SetupRoutes(r *chi.Mux) {
 	registerParamsHandler(r, handlers)
 	registerDAppHandler(r, handlers)
 	registerGmpHandler(r, handlers)
+	registerTransferHandler(r, handlers)
 	registerVaultHandler(r, handlers)
 	registerCustodialHandler(r, handlers)
 	registerValidatorHandler(r, handlers)
@@ -45,6 +46,9 @@ func registerGmpHandler(r *chi.Mux, handlers *handlers.Handler) {
 	r.Post("/v1/gmp/getDataMapping", registerHandler(handlers.GetGMPDataMapping))
 	r.Post("/v1/gmp/estimateTimeSpent", registerHandler(handlers.EstimateTimeSpent))
 
+}
+func registerTransferHandler(r *chi.Mux, handlers *handlers.Handler) {
+	r.Post("/v1/transfer/searchTransfers", registerHandler(handlers.TransferSearch))
 }
 
 func registerVaultHandler(r *chi.Mux, handlers *handlers.Handler) {

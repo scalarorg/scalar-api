@@ -39,9 +39,7 @@ stop-service:
 	docker-compose down
 	
 run-local:
-	./bin/local-startup.sh;
-	sleep 5;
-	go run cmd/xchains-api/main.go \
+	@go run cmd/xchains-api/main.go \
 		--config config/config-local.yml \
 		--params config/global-params.json \
 		--finality-providers config/finality-providers.json

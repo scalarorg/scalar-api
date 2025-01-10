@@ -3,11 +3,12 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 func (h *Handler) GMPStats(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +19,7 @@ func (h *Handler) GMPStats(request *http.Request) (*Result, *types.Error) {
 	return NewResult(gmps), nil
 }
 func (h *Handler) GMPStatsAVGTimes(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +31,7 @@ func (h *Handler) GMPStatsAVGTimes(request *http.Request) (*Result, *types.Error
 }
 
 func (h *Handler) GMPChart(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +43,7 @@ func (h *Handler) GMPChart(request *http.Request) (*Result, *types.Error) {
 }
 
 func (h *Handler) GMPCumulativeVolume(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +55,7 @@ func (h *Handler) GMPCumulativeVolume(request *http.Request) (*Result, *types.Er
 }
 
 func (h *Handler) GMPTotalVolume(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +67,7 @@ func (h *Handler) GMPTotalVolume(request *http.Request) (*Result, *types.Error) 
 }
 
 func (h *Handler) GMPTotalFee(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (h *Handler) GMPTotalFee(request *http.Request) (*Result, *types.Error) {
 }
 
 func (h *Handler) GMPTotalActiveUsers(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +91,7 @@ func (h *Handler) GMPTotalActiveUsers(request *http.Request) (*Result, *types.Er
 }
 
 func (h *Handler) GMPTopUsers(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ func (h *Handler) GMPTopUsers(request *http.Request) (*Result, *types.Error) {
 }
 
 func (h *Handler) GMPTopITSAssets(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +123,7 @@ func (h *Handler) GMPTopITSAssets(request *http.Request) (*Result, *types.Error)
 // @Success 200 {object} GmpPublicResponse[[]gmp.GMPDocument] "List of GMP"
 // @Router /v1/gmp/searchGMP [post]
 func (h *Handler) GMPSearch(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -131,17 +132,7 @@ func (h *Handler) GMPSearch(request *http.Request) (*Result, *types.Error) {
 		return nil, err
 	}
 
-	return NewGmpResult(gmps, total), nil
-}
-
-func NewGmpResult[T any](data T, total int) *Result {
-	res := &GmpPublicResponse[T]{Data: data, Total: total}
-	return &Result{Data: res, Status: http.StatusOK}
-}
-
-type GmpPublicResponse[T any] struct {
-	Data  T   `json:"data"`
-	Total int `json:"total,omitempty"`
+	return NewListResult(gmps, total), nil
 }
 
 // // No payload
@@ -167,7 +158,7 @@ type GmpPublicResponse[T any] struct {
 // }
 
 func (h *Handler) GetGMPDataMapping(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +170,7 @@ func (h *Handler) GetGMPDataMapping(request *http.Request) (*Result, *types.Erro
 }
 
 func (h *Handler) EstimateTimeSpent(request *http.Request) (*Result, *types.Error) {
-	gmpPayload, err := parseGmpPayload(request)
+	gmpPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
