@@ -8,7 +8,7 @@ import (
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
-func (s *Services) GMPSearch(ctx context.Context, payload *types.GmpPayload) ([]*models.GMPDocument, int, *types.Error) {
+func (s *Services) GMPSearch(ctx context.Context, payload *models.Options) ([]*models.GMPDocument, int, *types.Error) {
 	gmps, total, err := s.Pg.GMPSearch(ctx, payload)
 	if err != nil {
 		return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)

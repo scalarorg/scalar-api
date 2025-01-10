@@ -253,12 +253,3 @@ type GMPDocument struct {
 }
 
 type MapBlockEventAttributes map[string]string
-
-type Options struct {
-	Size         int
-	Offset       int
-	EventId      string
-	EventType    string
-	EventTypes   []string
-	StakerPubkey string
-}
