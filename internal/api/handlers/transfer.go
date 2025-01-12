@@ -7,20 +7,20 @@ import (
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
-// TransferSearch godoc
+// TokenSearch godoc
 // @Summary Search Transfer transactions
 // @Description Search for Transfer transactions with filters
-// @Tags transfer
+// @Tags token
 // @Accept json
 // @Produce json
 // @Success 200 {object} ListPublicResponse[[]models.TransferDocument] "List of Transfer"
-// @Router /v1/transfer/search [post]
-func (h *Handler) TransferSearch(request *http.Request) (*Result, *types.Error) {
+// @Router /v1/token/search [post]
+func (h *Handler) TokenSearchTransfers(request *http.Request) (*Result, *types.Error) {
 	transferPayload, err := models.ParseQueryOptions(request)
 	if err != nil {
 		return nil, err
 	}
-	transfers, total, err := h.services.TransferSearch(request.Context(), transferPayload)
+	transfers, total, err := h.services.TokenSearchTransfers(request.Context(), transferPayload)
 	if err != nil {
 		return nil, err
 	}

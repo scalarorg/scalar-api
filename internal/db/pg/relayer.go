@@ -20,18 +20,22 @@ func (c *PostgresClient) GetTokenSentRelayData(ctx context.Context, options *mod
 		options.Offset = 0
 	}
 
-	// Base query with JOIN
-	query := c.DB.Model(&relayer.RelayData{}).
-		Joins("LEFT JOIN token_sents ON relay_data.id = token_sents.relay_data_id")
+	// Base query
+	query := c.DB.Model(&relayer.RelayData{})
 
-	// Apply filters if tx_hash or event_id exists
+	// Apply filters using preload conditions
 	if options.TxHash != "" {
-		query = query.Where("token_sents.tx_hash = ?", options.TxHash)
+		query = query.Joins("JOIN token_sents ON relay_data.id = token_sents.relay_data_id").
+			Where("token_sents.tx_hash = ?", options.TxHash)
 	} else if options.EventId != "" {
-		query = query.Where("token_sents.event_id = ?", options.EventId)
+		query = query.Joins("JOIN token_sents ON relay_data.id = token_sents.relay_data_id").
+			Where("token_sents.event_id = ?", options.EventId)
 	}
 
-	// Count total records (only when not searching by specific criteria)
+	// Preload TokenSent
+	query = query.Preload("TokenSent")
+
+	// Count total records
 	if options.EventId == "" && options.TxHash == "" {
 		if err := query.Count(&totalCount).Error; err != nil {
 			return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
