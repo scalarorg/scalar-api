@@ -8,8 +8,8 @@ import (
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
-func (s *Services) TransferSearch(ctx context.Context, options *models.Options) ([]*models.TransferDocument, int, *types.Error) {
-	transfers, total, err := s.Pg.TransferSearch(ctx, options)
+func (s *Services) TokenSearchTransfers(ctx context.Context, options *models.Options) ([]*models.TransferDocument, int, *types.Error) {
+	transfers, total, err := s.Pg.TokenSearchTransfers(ctx, options)
 	if err != nil {
 		return nil, 0, types.NewError(http.StatusInternalServerError, types.InternalServiceError, err)
 	}

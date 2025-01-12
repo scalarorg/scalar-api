@@ -14,6 +14,7 @@ type TransferDocument struct {
 	Confirm   ConfirmInfo `json:"confirm"`
 	Link      LinkInfo    `json:"link"`
 	Command   CommandInfo `json:"command"`
+	Vote      VoteInfo    `json:"vote"`
 }
 
 // TimeInfo represents the timestamp information structure
@@ -39,9 +40,11 @@ type SendInfo struct {
 	RecipientAddress         string   `json:"recipient_address"`
 	Denom                    string   `json:"denom"`
 	Amount                   float64  `json:"amount"`
+	Value                    float64  `json:"value"`
 	DestinationChain         string   `json:"destination_chain"`
 	OriginalSourceChain      string   `json:"original_source_chain"`
 	Fee                      float64  `json:"fee"`
+	FeeValue                 float64  `json:"fee_value"`
 	AmountReceived           float64  `json:"amount_received"`
 	OriginalDestinationChain string   `json:"original_destination_chain"`
 	InsufficientFee          bool     `json:"insufficient_fee"`
@@ -102,4 +105,21 @@ type CommandInfo struct {
 	TransactionIndex uint     `json:"transaction_index"`
 	TransferID       uint     `json:"transfer_id"`
 	TransactionHash  string   `json:"transaction_hash"`
+}
+
+type VoteInfo struct {
+	TransactionID    string   `json:"transaction_id"`
+	PollID           string   `json:"poll_id"`
+	SourceChain      string   `json:"source_chain"`
+	CreatedAt        TimeInfo `json:"created_at"`
+	DestinationChain string   `json:"destination_chain"`
+	Confirmation     bool     `json:"confirmation"`
+	Type             string   `json:"type"`
+	Event            string   `json:"event"`
+	TxHash           string   `json:"txhash"`
+	Height           uint64   `json:"height"`
+	Status           string   `json:"status"`
+	TransferID       uint     `json:"transfer_id"`
+	Failed           bool     `json:"failed"`
+	Success          bool     `json:"success"`
 }
