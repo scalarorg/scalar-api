@@ -56,17 +56,30 @@ type TimeInfo struct {
 }
 
 func FormatTimeInfo(timestamp time.Time) TimeInfo {
-	// Convert to Unix nano to ensure consistent calculations
-	unixNano := timestamp.UnixNano()
+	// Keep MS as is since it's the base unit
+	ms := timestamp.UnixNano() / int64(time.Millisecond)
+
+	// Truncate to start of each period
+	hourStart := timestamp.Truncate(time.Hour)
+	dayStart := timestamp.Truncate(24 * time.Hour)
+	// Week starts on Monday by default
+	weekStart := timestamp.Truncate(24 * time.Hour * 7)
+	// For month, we need to set to first day
+	monthStart := time.Date(timestamp.Year(), timestamp.Month(), 1, 0, 0, 0, 0, timestamp.Location())
+	// Quarter - set to start of the quarter
+	quarter := (timestamp.Month()-1)/3*3 + 1
+	quarterStart := time.Date(timestamp.Year(), quarter, 1, 0, 0, 0, 0, timestamp.Location())
+	// Year - set to January 1st
+	yearStart := time.Date(timestamp.Year(), 1, 1, 0, 0, 0, 0, timestamp.Location())
 
 	return TimeInfo{
-		MS:      unixNano / int64(time.Millisecond),
-		Hour:    unixNano / int64(time.Hour),
-		Day:     unixNano / int64(time.Hour*24),
-		Week:    unixNano / int64(time.Hour*24*7),
-		Month:   unixNano / int64(time.Hour*24*30),
-		Quarter: unixNano / int64(time.Hour*24*90),
-		Year:    unixNano / int64(time.Hour*24*365),
+		MS:      ms,
+		Hour:    hourStart.UnixNano() / int64(time.Millisecond),
+		Day:     dayStart.UnixNano() / int64(time.Millisecond),
+		Week:    weekStart.UnixNano() / int64(time.Millisecond),
+		Month:   monthStart.UnixNano() / int64(time.Millisecond),
+		Quarter: quarterStart.UnixNano() / int64(time.Millisecond),
+		Year:    yearStart.UnixNano() / int64(time.Millisecond),
 	}
 }
 
