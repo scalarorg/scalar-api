@@ -1,12 +1,39 @@
 package models
 
+import "time"
+
+type TransferType string
+
+const (
+	TransferTypeSendToken      TransferType = "send_token"
+	TransferTypeDepositAddress TransferType = "deposit_address"
+)
+
+type VoteType string
+
+const (
+	VoteTypeVote VoteType = "vote"
+)
+
+type VoteEvent string
+
+const (
+	VoteEventTokenSent VoteEvent = "token_sent"
+)
+
+type ConfirmType string
+
+const (
+	ConfirmTypeVote ConfirmType = "vote"
+)
+
 // Transfer represents the main transfer record
 type TransferDocument struct {
-	ID               string `json:"id"`
-	Type             string `json:"type"`
-	Status           string `json:"status"`
-	SimplifiedStatus string `json:"simplified_status"`
-	TransferID       uint   `json:"transfer_id"`
+	ID               string       `json:"id"`
+	Type             TransferType `json:"type"`
+	Status           string       `json:"status"`
+	SimplifiedStatus string       `json:"simplified_status"`
+	TransferID       uint         `json:"transfer_id"`
 
 	// Relationships
 	Send      SendInfo    `json:"send"`
@@ -26,6 +53,21 @@ type TimeInfo struct {
 	Month   int64 `json:"month"`
 	Quarter int64 `json:"quarter"`
 	Year    int64 `json:"year"`
+}
+
+func FormatTimeInfo(timestamp time.Time) TimeInfo {
+	// Convert to Unix nano to ensure consistent calculations
+	unixNano := timestamp.UnixNano()
+
+	return TimeInfo{
+		MS:      unixNano / int64(time.Millisecond),
+		Hour:    unixNano / int64(time.Hour),
+		Day:     unixNano / int64(time.Hour*24),
+		Week:    unixNano / int64(time.Hour*24*7),
+		Month:   unixNano / int64(time.Hour*24*30),
+		Quarter: unixNano / int64(time.Hour*24*90),
+		Year:    unixNano / int64(time.Hour*24*365),
+	}
 }
 
 // SendInfo represents the send information
@@ -52,27 +94,26 @@ type SendInfo struct {
 
 // TimeSpent represents the time spent information
 type TimeSpent struct {
-	SendConfirm          int    `json:"send_confirm"`
-	ConfirmExecute       int    `json:"confirm_execute"`
-	Total                int    `json:"total"`
-	Type                 string `json:"type"`
-	DestinationChainType string `json:"destination_chain_type"`
-	SourceChainType      string `json:"source_chain_type"`
+	SendConfirm int `json:"send_confirm"`
+	ConfirmVote int `json:"confirm_vote"`
+	Total       int `json:"total"`
+	ConfirmIBC  int `json:"confirm_ibc"`
+	VoteIBC     int `json:"vote_ibc"`
 }
 
 // ConfirmInfo represents the confirm information
 type ConfirmInfo struct {
-	Amount           string   `json:"amount"`
-	SourceChain      string   `json:"source_chain"`
-	DepositAddress   string   `json:"deposit_address"`
-	CreatedAt        TimeInfo `json:"created_at"`
-	DestinationChain string   `json:"destination_chain"`
-	Denom            string   `json:"denom"`
-	TransferID       uint     `json:"transfer_id"`
-	Type             string   `json:"type"`
-	TxHash           string   `json:"txhash"`
-	Height           uint64   `json:"height"`
-	Status           string   `json:"status"`
+	Amount           string      `json:"amount"`
+	SourceChain      string      `json:"source_chain"`
+	DepositAddress   string      `json:"deposit_address"`
+	CreatedAt        TimeInfo    `json:"created_at"`
+	DestinationChain string      `json:"destination_chain"`
+	Denom            string      `json:"denom"`
+	TransferID       uint        `json:"transfer_id"`
+	Type             ConfirmType `json:"type"`
+	TxHash           string      `json:"txhash"`
+	Height           uint64      `json:"height"`
+	Status           string      `json:"status"`
 }
 
 // LinkInfo represents the link information
@@ -108,18 +149,17 @@ type CommandInfo struct {
 }
 
 type VoteInfo struct {
-	TransactionID    string   `json:"transaction_id"`
-	PollID           string   `json:"poll_id"`
-	SourceChain      string   `json:"source_chain"`
-	CreatedAt        TimeInfo `json:"created_at"`
-	DestinationChain string   `json:"destination_chain"`
-	Confirmation     bool     `json:"confirmation"`
-	Type             string   `json:"type"`
-	Event            string   `json:"event"`
-	TxHash           string   `json:"txhash"`
-	Height           uint64   `json:"height"`
-	Status           string   `json:"status"`
-	TransferID       uint     `json:"transfer_id"`
-	Failed           bool     `json:"failed"`
-	Success          bool     `json:"success"`
+	TransactionID    string    `json:"transaction_id"`
+	PollID           string    `json:"poll_id"`
+	SourceChain      string    `json:"source_chain"`
+	CreatedAt        TimeInfo  `json:"created_at"`
+	DestinationChain string    `json:"destination_chain"`
+	Confirmation     bool      `json:"confirmation"`
+	Type             VoteType  `json:"type"`
+	Event            VoteEvent `json:"event"`
+	TxHash           string    `json:"txhash"`
+	Height           uint64    `json:"height"`
+	Status           string    `json:"status"`
+	TransferID       uint      `json:"transfer_id"`
+	Success          bool      `json:"success"`
 }

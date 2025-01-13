@@ -10,7 +10,7 @@ require (
 	github.com/btcsuite/btcd/btcutil v1.1.6
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/scalarorg/data-models v0.0.0-20250110082742-2450fb11dfb5
+	github.com/scalarorg/data-models v0.0.0-20250113041627-3d5f6290f24c
 	github.com/scalarorg/xchains-indexer v0.0.0-20241205021823-db0507b3a4ad
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/viper v1.18.2

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/scalarorg/data-models/relayer"
+	"github.com/scalarorg/data-models/scalarnet"
 	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
@@ -28,22 +28,24 @@ func normalizeEventType(eventType string) string {
 }
 
 func (c *PostgresClient) GMPSearch(ctx context.Context, options *models.Options) ([]*models.GMPDocument, int, *types.Error) {
-	relayData, total, err := c.GetRelayerData(ctx, options)
-	if err != nil {
-		return nil, 0, err
-	}
+	// relayData, total, err := c.GetRelayerData(ctx, options)
+	// if err != nil {
+	// 	return nil, 0, err
+	// }
 
-	result, err := c.getGMPByRelayData(ctx, relayData)
-	if err != nil {
-		return nil, 0, err
-	}
-	return result, total, nil
+	// result, err := c.getGMPByRelayData(ctx, relayData)
+	// if err != nil {
+	// 	return nil, 0, err
+	// }
+	// return result, total, nil
+
+	return nil, 0, nil
 }
 
-func (c *PostgresClient) getGMPByRelayData(ctx context.Context, relayDatas []relayer.RelayData) ([]*models.GMPDocument, *types.Error) {
-	messageIds := make([]string, len(relayDatas))
-	for index, event := range relayDatas {
-		messageIds[index] = event.ID
+func (c *PostgresClient) getGMPByRelayData(ctx context.Context, callContracts []scalarnet.CallContract) ([]*models.GMPDocument, *types.Error) {
+	messageIds := make([]string, len(callContracts))
+	for index, event := range callContracts {
+		messageIds[index] = event.EventID
 	}
 	// options := &postgres.Options{}
 	// blockEvents, err := c.indexer.FindBlockEventsByAttribute(ctx, "event_id", messageIds, options)
@@ -57,23 +59,23 @@ func (c *PostgresClient) getGMPByRelayData(ctx context.Context, relayDatas []rel
 	// eventAttributes, err := c.indexer.FindEventAttributes(ctx, eventIds)
 	// fmt.Printf("EventAttributes %v", eventAttributes)
 	mapGmps := make(map[string]*models.GMPDocument)
-	mapRelayDatas := make(map[string]relayer.RelayData)
-	gmps := make([]*models.GMPDocument, len(relayDatas))
-	for index, relayData := range relayDatas {
+	mapRelayDatas := make(map[string]scalarnet.CallContract)
+	gmps := make([]*models.GMPDocument, len(callContracts))
+	for index, callContract := range callContracts {
 		gmps[index] = &models.GMPDocument{
-			ID: relayData.ID,
+			ID: callContract.EventID,
 			// From:   relayData.From,
 			// To:     relayData.To,
 			// Status: relayData.Status.String,
 			// CreatedAt: relayData.CreatedAt,
 			// UpdatedAt: relayData.UpdatedAt,
-			Status:           strconv.Itoa(int(relayData.Status)),
-			SimplifiedStatus: string(models.ToReadableStatus(int(relayData.Status))),
+			Status:           "",
+			SimplifiedStatus: "",
 		}
-		createCallContract(gmps[index], &relayData)
-		createCallContractApproved(gmps[index], &relayData)
-		mapRelayDatas[relayData.ID] = relayData
-		mapGmps[relayData.ID] = gmps[index]
+		createCallContract(gmps[index], &callContract)
+		createCallContractApproved(gmps[index], &callContract)
+		mapRelayDatas[callContract.EventID] = callContract
+		mapGmps[callContract.EventID] = gmps[index]
 	}
 	// for _, event := range blockEvents {
 	// 	if attributes, ok := eventAttributes[event.ID]; ok {
@@ -108,8 +110,8 @@ func (c *PostgresClient) getGMPByRelayData(ctx context.Context, relayDatas []rel
 	return gmps, nil
 }
 
-func createCallContract(gmp *models.GMPDocument, relayData *relayer.RelayData) {
-	from := "relayData.CallContract.Sender.String"
+func createCallContract(gmp *models.GMPDocument, callContract *scalarnet.CallContract) {
+	// from := "relayData.CallContract.Sender.String"
 	// Nov 11, Taivv: SenderAddress is stored using electrum indexer, get from first txin.script_pubkey
 	// if relayData.CallContract.StakerPublicKey.String != "" {
 	// 	stakerAddress, err := config.GetTaprootAddress(relayData.From.String, relayData.CallContract.StakerPublicKey.String)
@@ -123,33 +125,33 @@ func createCallContract(gmp *models.GMPDocument, relayData *relayer.RelayData) {
 	// }
 
 	call := models.GMPStepDocument{
-		ID:              relayData.ID,
-		Chain:           relayData.From,
+		ID:              callContract.EventID,
+		Chain:           callContract.SourceChain,
 		Event:           normalizeEventType(EVENT_TYPE_CONTRACT_CALL),
-		ContractAddress: relayData.CallContract.DestContractAddress,
+		ContractAddress: callContract.DestContractAddress,
 		Transaction: models.TransactionDocument{
-			Hash: relayData.CallContract.TxHash,
-			From: from,
+			Hash: callContract.TxHash,
+			From: callContract.SourceAddress,
 		},
 		ReturnValues: models.ReturnValuesDocument{
-			DestinationChain: relayData.To,
+			DestinationChain: callContract.DestinationChain,
 		},
-		BlockNumber:     uint64(relayData.CallContract.BlockNumber),
-		TransactionHash: relayData.CallContract.TxHash,
+		BlockNumber:     uint64(callContract.BlockNumber),
+		TransactionHash: callContract.TxHash,
 		//XChains Todo: Created
-		BlockTimestamp: relayData.CreatedAt.Unix(),
-		LogIndex:       uint(relayData.CallContract.LogIndex),
+		BlockTimestamp: callContract.CreatedAt.Unix(),
+		LogIndex:       uint(callContract.LogIndex),
 	}
 
-	if relayData.CallContract.DestContractAddress != "" {
-		call.ContractAddress = relayData.CallContract.DestContractAddress
-		call.ReturnValues.Sender = relayData.CallContract.SourceAddress
-		call.ReturnValues.PayloadHash = relayData.CallContract.PayloadHash
-		call.ReturnValues.Payload = hex.EncodeToString(relayData.CallContract.Payload)
-		call.ReturnValues.SourceAddress = relayData.CallContract.SourceAddress
-		call.ReturnValues.DestinationContractAddress = relayData.CallContract.DestContractAddress
-		call.ReturnValues.DestinationChain = relayData.To
-		call.ReturnValues.ContractAddress = relayData.CallContract.DestContractAddress
+	if callContract.DestContractAddress != "" {
+		call.ContractAddress = callContract.DestContractAddress
+		call.ReturnValues.Sender = callContract.SourceAddress
+		call.ReturnValues.PayloadHash = callContract.PayloadHash
+		call.ReturnValues.Payload = hex.EncodeToString(callContract.Payload)
+		call.ReturnValues.SourceAddress = callContract.SourceAddress
+		call.ReturnValues.DestinationContractAddress = callContract.DestContractAddress
+		call.ReturnValues.DestinationChain = callContract.DestinationChain
+		call.ReturnValues.ContractAddress = callContract.DestContractAddress
 	}
 	// if relayData.CallContractWithToken.ContractAddress.Valid {
 	// 	call.ContractAddress = relayData.CallContractWithToken.ContractAddress.String
@@ -167,7 +169,7 @@ func createCallContract(gmp *models.GMPDocument, relayData *relayer.RelayData) {
 	// fmt.Printf("Call chain %s\n", call.Chain)
 }
 
-func createCallContractApproved(gmp *models.GMPDocument, relayData *relayer.RelayData) {
+func createCallContractApproved(gmp *models.GMPDocument, callContract *scalarnet.CallContract) {
 	approved := models.GMPStepDocument{
 		//Todo: Fetch blockhash/Number/Timestamp?
 		BlockHash: "",
@@ -175,8 +177,8 @@ func createCallContractApproved(gmp *models.GMPDocument, relayData *relayer.Rela
 		Event: normalizeEventType(EVENT_TYPE_CONTRACT_CALL_APPROVED),
 		//Todo: Fill ChainType by ChainID/ChainName
 		ChainType:       "",
-		Address:         relayData.CallContract.SourceAddress,
-		ContractAddress: relayData.CallContract.DestContractAddress,
+		Address:         callContract.SourceAddress,
+		ContractAddress: callContract.DestContractAddress,
 	}
 
 	// if relayData.CallContract..SourceTxHash.Valid {
@@ -200,13 +202,13 @@ func createCallContractApproved(gmp *models.GMPDocument, relayData *relayer.Rela
 	gmp.Approved = approved
 }
 
-func createGMPDocument(gmp *models.GMPDocument, relayData *relayer.RelayData, event *models.BlockEvent, attribute models.MapBlockEventAttributes) {
+func createGMPDocument(gmp *models.GMPDocument, callContract *scalarnet.CallContract, event *models.BlockEvent, attribute models.MapBlockEventAttributes) {
 	gmp.ID = parseAttributeValue(attribute["event_id"]).(string)
 	gmp.CommandID = parseAttributeValue(attribute["command_id"]).(string)
 	// fmt.Printf("Event id %s\n", attribute["event_id"])
 	switch event.BlockEventType.Type {
 	case EVENT_TYPE_CONTRACT_CALL_APPROVED:
-		gmp.Approved = createApprovedEvent(relayData, event, attribute)
+		gmp.Approved = createApprovedEvent(callContract, event, attribute)
 	}
 	// gmp.Call = createCallContract(event, attribute)
 	// gmp.Confirm = createConfirmEvent(event, attribute)
@@ -230,7 +232,7 @@ func createConfirmEvent(event *models.BlockEvent, attribute models.MapBlockEvent
 }
 
 // Load data from event CallContractApproved
-func createApprovedEvent(relayData *relayer.RelayData, event *models.BlockEvent, attribute models.MapBlockEventAttributes) models.GMPStepDocument {
+func createApprovedEvent(callContract *scalarnet.CallContract, event *models.BlockEvent, attribute models.MapBlockEventAttributes) models.GMPStepDocument {
 	eventId := parseAttributeValue(attribute["event_id"]).(string)
 	//Todo fill address and contract address
 	address := ""

@@ -4,164 +4,119 @@ import (
 	"context"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/scalarorg/data-models/relayer"
+	"github.com/scalarorg/data-models/chains"
 	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 func (c *PostgresClient) TokenSearchTransfers(ctx context.Context, options *models.Options) ([]*models.TransferDocument, int, *types.Error) {
-	relayData, total, err := c.GetTokenSentRelayData(ctx, options)
+	tokenSents, total, err := c.ListTokenSents(ctx, options)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	result, err := c.getTransferByRelayData(ctx, relayData)
+	// TODO: join with token_approvals and commands, votes
+
+	transfers, err := c.getTransferByRelayData(tokenSents)
 	if err != nil {
 		return nil, 0, err
 	}
-	return result, total, nil
+
+	return transfers, total, nil
 }
 
-func (c *PostgresClient) getTransferByRelayData(ctx context.Context, relayData []relayer.RelayData) ([]*models.TransferDocument, *types.Error) {
-	messageIds := make([]string, len(relayData))
-	for index, event := range relayData {
-		messageIds[index] = event.ID
+func (c *PostgresClient) getTransferByRelayData(tokenSents []*chains.TokenSent) ([]*models.TransferDocument, *types.Error) {
+	messageIds := make([]string, len(tokenSents))
+	for index, sent := range tokenSents {
+		messageIds[index] = sent.EventID
 	}
 
-	transfers := make([]*models.TransferDocument, len(relayData))
-	for index, relayData := range relayData {
-		createdAt := relayData.CreatedAt
-		ms := createdAt.UnixNano() / int64(time.Millisecond)
-		hour := createdAt.UnixNano() / int64(time.Hour)
-		day := createdAt.UnixNano() / int64(time.Hour*24)
-		week := createdAt.UnixNano() / int64(time.Hour*24*7)
-		month := createdAt.UnixNano() / int64(time.Hour*24*30)
-		quarter := createdAt.UnixNano() / int64(time.Hour*24*90)
-		year := createdAt.UnixNano() / int64(time.Hour*24*365)
+	transfers := make([]*models.TransferDocument, len(tokenSents))
+	for index, sent := range tokenSents {
+		createdAt := sent.CreatedAt
+		timeInfo := models.FormatTimeInfo(createdAt)
 		transfers[index] = &models.TransferDocument{
-			ID:               relayData.ID,
-			Type:             "send_token", // TODO: change it
-			Status:           strconv.Itoa(int(relayData.Status)),
-			SimplifiedStatus: string(models.ToReadableStatus(int(relayData.Status))),
+			ID:               sent.EventID,
+			Type:             models.TransferTypeSendToken, // TODO: change it
+			Status:           string(sent.Status),
+			SimplifiedStatus: string(sent.Status),
 			TransferID:       uint(0), // TODO: change it
 			Send: models.SendInfo{
-				TxHash: relayData.TokenSent.TxHash,
-				Height: relayData.TokenSent.BlockNumber,
-				Status: "success",
-				Type:   strings.Split(relayData.From, "|")[0],
-				CreatedAt: models.TimeInfo{
-					MS:      ms,
-					Hour:    hour,
-					Day:     day,
-					Week:    week,
-					Month:   month,
-					Quarter: quarter,
-					Year:    year,
-				},
-				SourceChain:              relayData.From,
-				SenderAddress:            relayData.TokenSent.SourceAddress,
-				RecipientAddress:         relayData.TokenSent.DestinationAddress,
-				Denom:                    relayData.TokenSent.Symbol,
-				Amount:                   float64(relayData.TokenSent.Amount),
-				Value:                    float64(relayData.TokenSent.Amount),
-				DestinationChain:         relayData.To,
-				OriginalSourceChain:      relayData.From,
-				Fee:                      5,
-				FeeValue:                 float64(5.2),
-				AmountReceived:           float64(relayData.TokenSent.Amount - 5),
-				OriginalDestinationChain: relayData.To,
+				TxHash:                   sent.TxHash,
+				Height:                   sent.BlockNumber,
+				Status:                   string(sent.Status),
+				Type:                     strings.Split(sent.SourceChain, "|")[0], // TODO: define a map in bitcoin-vault/go-utils to get the chain type and display name
+				CreatedAt:                timeInfo,
+				SourceChain:              sent.SourceChain,
+				SenderAddress:            sent.SourceAddress,
+				RecipientAddress:         sent.DestinationAddress,
+				Denom:                    sent.Symbol,
+				Amount:                   float64(sent.Amount),
+				Value:                    float64(sent.Amount),
+				DestinationChain:         sent.DestinationChain,
+				OriginalSourceChain:      sent.SourceChain,
+				Fee:                      0,
+				FeeValue:                 0,
+				AmountReceived:           float64(sent.Amount),
+				OriginalDestinationChain: sent.DestinationChain,
 				InsufficientFee:          true,
 			},
 			Link: models.LinkInfo{
-				ID:                       relayData.ID,
-				Denom:                    relayData.TokenSent.Symbol,
-				OriginalDestinationChain: relayData.To,
-				Height:                   relayData.TokenSent.BlockNumber,
-				TxHash:                   relayData.TokenSent.TxHash,
-				CreatedAt: models.TimeInfo{
-					MS:      createdAt.UnixNano() / int64(time.Millisecond),
-					Hour:    hour,
-					Day:     day,
-					Week:    week,
-					Month:   month,
-					Quarter: quarter,
-					Year:    year,
-				},
-				SourceChain:         relayData.From,
-				SenderAddress:       relayData.TokenSent.SourceAddress,
-				RecipientAddress:    relayData.TokenSent.DestinationAddress,
-				DestinationChain:    relayData.To,
-				OriginalSourceChain: relayData.From,
+				ID:                       sent.EventID,
+				Denom:                    sent.Symbol,
+				OriginalDestinationChain: sent.DestinationChain,
+				Height:                   sent.BlockNumber,
+				TxHash:                   sent.TxHash,
+				CreatedAt:                timeInfo,
+				SourceChain:              sent.SourceChain,
+				SenderAddress:            sent.SourceAddress,
+				RecipientAddress:         sent.DestinationAddress,
+				DestinationChain:         sent.DestinationChain,
+				OriginalSourceChain:      sent.SourceChain,
 			},
 			TimeSpent: models.TimeSpent{},
 			// TODO: Query from appove to get vote, command, and confirm
 			Command: models.CommandInfo{
-				Chain:       relayData.From,
-				CommandID:   "0000000000000000000000000000000000000000000000000000000000000000",
-				LogIndex:    uint(relayData.TokenSent.LogIndex),
-				BatchID:     "0000000000000000000000000000000000000000000000000000000000000000",
-				BlockNumber: uint64(relayData.TokenSent.BlockNumber),
-				CreatedAt: models.TimeInfo{
-					MS:      createdAt.UnixNano() / int64(time.Millisecond),
-					Hour:    hour,
-					Day:     day,
-					Week:    week,
-					Month:   month,
-					Quarter: quarter,
-					Year:    year,
-				},
+				Chain:            sent.SourceChain,
+				CommandID:        "",
+				LogIndex:         uint(sent.LogIndex),
+				BatchID:          "",
+				BlockNumber:      uint64(sent.BlockNumber),
+				CreatedAt:        timeInfo,
 				Executed:         true,
-				BlockTimestamp:   int64(relayData.TokenSent.BlockNumber),
-				TransactionIndex: uint(relayData.TokenSent.LogIndex),
+				BlockTimestamp:   int64(sent.BlockNumber),
+				TransactionIndex: uint(sent.LogIndex),
 				TransferID:       uint(0),
-				TransactionHash:  relayData.TokenSent.TxHash,
+				TransactionHash:  sent.TxHash,
 			},
 			Vote: models.VoteInfo{
-				TransactionID: relayData.TokenSent.TxHash,
-				PollID:        strconv.FormatUint(uint64(relayData.TokenSent.BlockNumber), 10),
-				SourceChain:   relayData.From,
-				CreatedAt: models.TimeInfo{
-					MS:      createdAt.UnixNano() / int64(time.Millisecond),
-					Hour:    hour,
-					Day:     day,
-					Week:    week,
-					Month:   month,
-					Quarter: quarter,
-					Year:    year,
-				},
-				DestinationChain: relayData.To,
+				TransactionID:    sent.TxHash,
+				PollID:           strconv.FormatUint(uint64(sent.BlockNumber), 10),
+				SourceChain:      sent.SourceChain,
+				CreatedAt:        timeInfo,
+				DestinationChain: sent.DestinationChain,
 				Confirmation:     true,
-				Type:             "Vote",
-				Event:            "token_sent",
-				TxHash:           relayData.TokenSent.TxHash,
-				Height:           relayData.TokenSent.BlockNumber,
+				Type:             models.VoteTypeVote,
+				Event:            models.VoteEventTokenSent,
+				TxHash:           sent.TxHash,
+				Height:           sent.BlockNumber,
 				Status:           "success",
 				TransferID:       uint(0),
-				Failed:           false,
 				Success:          true,
 			},
 			Confirm: models.ConfirmInfo{
-				Amount:         strconv.FormatUint(uint64(relayData.TokenSent.Amount), 10),
-				SourceChain:    relayData.From,
-				DepositAddress: relayData.TokenSent.DestinationAddress,
-				CreatedAt: models.TimeInfo{
-					MS:      createdAt.UnixNano() / int64(time.Millisecond),
-					Hour:    hour,
-					Day:     day,
-					Week:    week,
-					Month:   month,
-					Quarter: quarter,
-					Year:    year,
-				},
-				TxHash:           relayData.TokenSent.TxHash,
-				Height:           relayData.TokenSent.BlockNumber,
+				Amount:           strconv.FormatUint(uint64(sent.Amount), 10),
+				SourceChain:      sent.SourceChain,
+				DepositAddress:   sent.DestinationAddress,
+				CreatedAt:        timeInfo,
+				TxHash:           sent.TxHash,
+				Height:           sent.BlockNumber,
 				Status:           "success",
 				TransferID:       uint(0),
-				Denom:            relayData.TokenSent.Symbol,
-				DestinationChain: relayData.To,
-				Type:             "vote",
+				Denom:            sent.Symbol,
+				DestinationChain: sent.DestinationChain,
+				Type:             models.ConfirmTypeVote,
 			},
 		}
 	}
