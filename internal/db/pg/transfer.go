@@ -3,8 +3,8 @@ package pg
 import (
 	"context"
 	"strconv"
-	"strings"
 
+	"github.com/scalarorg/bitcoin-vault/go-utils/chain"
 	"github.com/scalarorg/data-models/chains"
 	"github.com/scalarorg/xchains-api/internal/db/pg/models"
 	"github.com/scalarorg/xchains-api/internal/types"
@@ -36,6 +36,25 @@ func (c *PostgresClient) getTransferByRelayData(tokenSents []*chains.TokenSent) 
 	for index, sent := range tokenSents {
 		createdAt := sent.CreatedAt
 		timeInfo := models.FormatTimeInfo(createdAt)
+
+		var sourceChain string
+		var sourceChainInfo chain.ChainInfo
+		err := sourceChainInfo.FromString(sent.SourceChain)
+		if err != nil {
+			sourceChain = sent.SourceChain
+		} else {
+			sourceChain = chain.GetDisplayedName(sourceChainInfo)
+		}
+
+		var destinationChain string
+		var destinationChainInfo chain.ChainInfo
+		err = destinationChainInfo.FromString(sent.DestinationChain)
+		if err != nil {
+			destinationChain = sent.DestinationChain
+		} else {
+			destinationChain = chain.GetDisplayedName(destinationChainInfo)
+		}
+
 		transfers[index] = &models.TransferDocument{
 			ID:               sent.EventID,
 			Type:             models.TransferTypeSendToken, // TODO: change it
@@ -46,39 +65,39 @@ func (c *PostgresClient) getTransferByRelayData(tokenSents []*chains.TokenSent) 
 				TxHash:                   sent.TxHash,
 				Height:                   sent.BlockNumber,
 				Status:                   string(sent.Status),
-				Type:                     strings.Split(sent.SourceChain, "|")[0], // TODO: define a map in bitcoin-vault/go-utils to get the chain type and display name
+				Type:                     sourceChainInfo.ChainType.String(),
 				CreatedAt:                timeInfo,
-				SourceChain:              sent.SourceChain,
+				SourceChain:              sourceChain,
 				SenderAddress:            sent.SourceAddress,
 				RecipientAddress:         sent.DestinationAddress,
 				Denom:                    sent.Symbol,
 				Amount:                   float64(sent.Amount),
 				Value:                    float64(sent.Amount),
-				DestinationChain:         sent.DestinationChain,
-				OriginalSourceChain:      sent.SourceChain,
+				DestinationChain:         destinationChain,
+				OriginalSourceChain:      sourceChain,
 				Fee:                      0,
 				FeeValue:                 0,
 				AmountReceived:           float64(sent.Amount),
-				OriginalDestinationChain: sent.DestinationChain,
+				OriginalDestinationChain: destinationChain,
 				InsufficientFee:          true,
 			},
 			Link: models.LinkInfo{
 				ID:                       sent.EventID,
 				Denom:                    sent.Symbol,
-				OriginalDestinationChain: sent.DestinationChain,
+				OriginalDestinationChain: destinationChain,
 				Height:                   sent.BlockNumber,
 				TxHash:                   sent.TxHash,
 				CreatedAt:                timeInfo,
-				SourceChain:              sent.SourceChain,
+				SourceChain:              sourceChain,
 				SenderAddress:            sent.SourceAddress,
 				RecipientAddress:         sent.DestinationAddress,
-				DestinationChain:         sent.DestinationChain,
-				OriginalSourceChain:      sent.SourceChain,
+				DestinationChain:         destinationChain,
+				OriginalSourceChain:      sourceChain,
 			},
 			TimeSpent: models.TimeSpent{},
 			// TODO: Query from appove to get vote, command, and confirm
 			Command: models.CommandInfo{
-				Chain:            sent.SourceChain,
+				Chain:            sourceChain,
 				CommandID:        "",
 				LogIndex:         uint(sent.LogIndex),
 				BatchID:          "",
@@ -93,9 +112,9 @@ func (c *PostgresClient) getTransferByRelayData(tokenSents []*chains.TokenSent) 
 			Vote: models.VoteInfo{
 				TransactionID:    sent.TxHash,
 				PollID:           strconv.FormatUint(uint64(sent.BlockNumber), 10),
-				SourceChain:      sent.SourceChain,
+				SourceChain:      sourceChain,
 				CreatedAt:        timeInfo,
-				DestinationChain: sent.DestinationChain,
+				DestinationChain: destinationChain,
 				Confirmation:     true,
 				Type:             models.VoteTypeVote,
 				Event:            models.VoteEventTokenSent,
@@ -107,7 +126,7 @@ func (c *PostgresClient) getTransferByRelayData(tokenSents []*chains.TokenSent) 
 			},
 			Confirm: models.ConfirmInfo{
 				Amount:           strconv.FormatUint(uint64(sent.Amount), 10),
-				SourceChain:      sent.SourceChain,
+				SourceChain:      sourceChain,
 				DepositAddress:   sent.DestinationAddress,
 				CreatedAt:        timeInfo,
 				TxHash:           sent.TxHash,
@@ -115,7 +134,7 @@ func (c *PostgresClient) getTransferByRelayData(tokenSents []*chains.TokenSent) 
 				Status:           "success",
 				TransferID:       uint(0),
 				Denom:            sent.Symbol,
-				DestinationChain: sent.DestinationChain,
+				DestinationChain: destinationChain,
 				Type:             models.ConfirmTypeVote,
 			},
 		}
