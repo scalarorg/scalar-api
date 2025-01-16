@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"regexp"
 
-	bbntypes "github.com/babylonchain/babylon/types"
 	"github.com/btcsuite/btcd/btcec/v2/schnorr"
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -64,13 +63,6 @@ func IsBase64Encoded(s string) bool {
 
 	// Try to decode the string.
 	_, err := base64.StdEncoding.DecodeString(s)
-	return err == nil
-}
-
-// IsValidTxHex checks if the given string is a valid BTC transaction hex
-// Note: it does not check the actual content of the transaction.
-func IsValidTxHex(txHex string) bool {
-	_, _, err := bbntypes.NewBTCTxFromHex(txHex)
 	return err == nil
 }
 

@@ -12,7 +12,6 @@ import (
 	"github.com/scalarorg/xchains-api/internal/observability/healthcheck"
 	"github.com/scalarorg/xchains-api/internal/observability/metrics"
 	"github.com/scalarorg/xchains-api/internal/services"
-	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 func init() {
@@ -36,23 +35,11 @@ func main() {
 		log.Fatal().Err(err).Msg(fmt.Sprintf("error while loading config file: %s", cfgPath))
 	}
 
-	paramsPath := cli.GetGlobalParamsPath()
-	params, err := types.NewGlobalParams(paramsPath)
-	if err != nil {
-		log.Fatal().Err(err).Msg(fmt.Sprintf("error while loading global params file: %s", paramsPath))
-	}
-
-	finalityProvidersPath := cli.GetFinalityProvidersPath()
-	finalityProviders, err := types.NewFinalityProviders(finalityProvidersPath)
-	if err != nil {
-		log.Fatal().Err(err).Msg(fmt.Sprintf("error while loading finality providers file: %s", finalityProvidersPath))
-	}
-
 	// initialize metrics with the metrics port from config
 	metricsPort := cfg.Metrics.GetMetricsPort()
 	metrics.Init(metricsPort)
 
-	services, err := services.New(ctx, cfg, params, finalityProviders)
+	services, err := services.New(ctx, cfg)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error while setting up staking services layer")
 	}

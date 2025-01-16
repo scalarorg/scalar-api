@@ -7,23 +7,18 @@ import (
 
 	"github.com/scalarorg/xchains-api/internal/config"
 	"github.com/scalarorg/xchains-api/internal/db/pg"
-	"github.com/scalarorg/xchains-api/internal/types"
 )
 
 // Service layer contains the business logic and is used to interact with
 // the database and other external clients (if any).
 type Services struct {
-	Pg                *pg.PostgresClient
-	cfg               *config.Config
-	params            *types.GlobalParams
-	finalityProviders []types.FinalityProviderDetails
+	Pg  *pg.PostgresClient
+	cfg *config.Config
 }
 
 func New(
 	ctx context.Context,
 	cfg *config.Config,
-	globalParams *types.GlobalParams,
-	finalityProviders []types.FinalityProviderDetails,
 ) (*Services, error) {
 	pgdb, err := pg.New(ctx, cfg.RelayerDb)
 	if err != nil {
@@ -32,9 +27,7 @@ func New(
 	}
 
 	return &Services{
-		Pg:                pgdb,
-		cfg:               cfg,
-		params:            globalParams,
-		finalityProviders: finalityProviders,
+		Pg:  pgdb,
+		cfg: cfg,
 	}, nil
 }

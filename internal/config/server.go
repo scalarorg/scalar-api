@@ -6,10 +6,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/rs/zerolog"
-
-	"github.com/scalarorg/xchains-api/internal/utils"
 )
 
 type ServerConfig struct {
@@ -24,7 +21,7 @@ type ServerConfig struct {
 	MaxContentLength    int64         `mapstructure:"max-content-length"`
 	HealthCheckInterval int           `mapstructure:"health-check-interval"`
 
-	BTCNetParam *chaincfg.Params
+	// BTCNetParam *chaincfg.Params
 }
 
 func (cfg *ServerConfig) Validate() error {
@@ -56,13 +53,6 @@ func (cfg *ServerConfig) Validate() error {
 	if cfg.HealthCheckInterval <= 0 {
 		return fmt.Errorf("HealthCheckInterval must be a positive integer")
 	}
-
-	btcNet, err := utils.GetBtcNetParamesFromString(cfg.BTCNet)
-	if err != nil {
-		return errors.New("invalid btc-net")
-	}
-
-	cfg.BTCNetParam = btcNet
 
 	return nil
 }

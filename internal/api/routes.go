@@ -10,7 +10,6 @@ import (
 func (a *Server) SetupRoutes(r *chi.Mux) {
 	handlers := a.handlers
 	r.Get("/healthcheck", registerHandler(handlers.HealthCheck))
-	r.Get("/v1/global-params", registerHandler(handlers.GetScalarGlobalParams))
 
 	registerParamsHandler(r, handlers)
 	registerDAppHandler(r, handlers)
