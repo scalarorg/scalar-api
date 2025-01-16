@@ -186,8 +186,6 @@ github.com/sagikazarmark/slog-shim v0.1.0 h1:diDBnUNK9N/354PgrxMywXnAwEr1QZcOr6g
 github.com/sagikazarmark/slog-shim v0.1.0/go.mod h1:SrcSrq8aKtyuqEI1uvTDTK1arOWRIczQRv+GVI1AkeQ=
 github.com/scalarorg/bitcoin-vault/go-utils v0.0.0-20250116044226-07815838b26d h1:kYThTC4mzW8fYv4navSHFJ+uhYC+8il8DgYzCUNlUtM=
 github.com/scalarorg/bitcoin-vault/go-utils v0.0.0-20250116044226-07815838b26d/go.mod h1:LG6gpTio0/hxYdoi4WSeQm1ywfXx5uhMD5Bi9cMWih0=
-github.com/scalarorg/data-models v0.0.0-20250113041627-3d5f6290f24c h1:scOazVeUrcKx6CeYlaIqBpiziz2BdCOPf1elbNEoTzw=
-github.com/scalarorg/data-models v0.0.0-20250113041627-3d5f6290f24c/go.mod h1:kIETfvOtm6s9SC3+w9+z7m932RHSLtn7LiJLlLPm48w=
 github.com/scalarorg/data-models v0.0.0-20250123023305-d1c76e395e77 h1:ddgedkxcsFLOluD11WcW3oyoQvpq9fkAW0niXO5rv7o=
 github.com/scalarorg/data-models v0.0.0-20250123023305-d1c76e395e77/go.mod h1:kIETfvOtm6s9SC3+w9+z7m932RHSLtn7LiJLlLPm48w=
 github.com/scalarorg/xchains-indexer v0.0.0-20241205021823-db0507b3a4ad h1:Wy8vgPMrLWRC9iMrRQkVPjHG9N/Z31WKkF6+D8jUGyk=
