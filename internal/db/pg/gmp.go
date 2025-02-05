@@ -2,7 +2,6 @@ package pg
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
@@ -128,7 +127,7 @@ func createCallContract(gmp *models.GMPDocument, callContract *scalarnet.CallCon
 		ID:              callContract.EventID,
 		Chain:           callContract.SourceChain,
 		Event:           normalizeEventType(EVENT_TYPE_CONTRACT_CALL),
-		ContractAddress: callContract.DestContractAddress,
+		ContractAddress: "",
 		Transaction: models.TransactionDocument{
 			Hash: callContract.TxHash,
 			From: callContract.SourceAddress,
@@ -143,16 +142,16 @@ func createCallContract(gmp *models.GMPDocument, callContract *scalarnet.CallCon
 		LogIndex:       uint(callContract.LogIndex),
 	}
 
-	if callContract.DestContractAddress != "" {
-		call.ContractAddress = callContract.DestContractAddress
-		call.ReturnValues.Sender = callContract.SourceAddress
-		call.ReturnValues.PayloadHash = callContract.PayloadHash
-		call.ReturnValues.Payload = hex.EncodeToString(callContract.Payload)
-		call.ReturnValues.SourceAddress = callContract.SourceAddress
-		call.ReturnValues.DestinationContractAddress = callContract.DestContractAddress
-		call.ReturnValues.DestinationChain = callContract.DestinationChain
-		call.ReturnValues.ContractAddress = callContract.DestContractAddress
-	}
+	// if callContract.DestContractAddress != "" {
+	// 	call.ContractAddress = callContract.DestContractAddress
+	// 	call.ReturnValues.Sender = callContract.SourceAddress
+	// 	call.ReturnValues.PayloadHash = callContract.PayloadHash
+	// 	call.ReturnValues.Payload = hex.EncodeToString(callContract.Payload)
+	// 	call.ReturnValues.SourceAddress = callContract.SourceAddress
+	// 	call.ReturnValues.DestinationContractAddress = callContract.DestContractAddress
+	// 	call.ReturnValues.DestinationChain = callContract.DestinationChain
+	// 	call.ReturnValues.ContractAddress = callContract.DestContractAddress
+	// }
 	// if relayData.CallContractWithToken.ContractAddress.Valid {
 	// 	call.ContractAddress = relayData.CallContractWithToken.ContractAddress.String
 	// 	call.ReturnValues.Sender = relayData.CallContractWithToken.SourceAddress.String
@@ -178,7 +177,7 @@ func createCallContractApproved(gmp *models.GMPDocument, callContract *scalarnet
 		//Todo: Fill ChainType by ChainID/ChainName
 		ChainType:       "",
 		Address:         callContract.SourceAddress,
-		ContractAddress: callContract.DestContractAddress,
+		ContractAddress: "",
 	}
 
 	// if relayData.CallContract..SourceTxHash.Valid {
